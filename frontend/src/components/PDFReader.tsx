@@ -17,52 +17,91 @@ const PDFPage: React.FC<PDFPageProps> = ({ pageNumber, pdfUrl }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [renderedImage, setRenderedImage] = useState<string | null>(null);
 
   useEffect(() => {
-    const renderPage = async () => {
-      if (!canvasRef.current) return;
+    console.log(`[PDFPage] 开始渲染页面 ${pageNumber}, URL: ${pdfUrl}`);
 
+    const renderPage = async () => {
       try {
+        console.log(`[PDFPage] 开始加载PDF文档，页面 ${pageNumber}`);
         setLoading(true);
         setError(null);
 
         // 加载PDF文档
         const loadingTask = pdfjsLib.getDocument(pdfUrl);
+        console.log(`[PDFPage] PDF加载任务创建完成，页面 ${pageNumber}`);
+
         const pdf = await loadingTask.promise;
+        console.log(`[PDFPage] PDF文档加载完成，总页数: ${pdf.numPages}, 请求页面: ${pageNumber}`);
+
+        // 检查页面是否存在
+        if (pageNumber > pdf.numPages) {
+          throw new Error(`页面 ${pageNumber} 不存在，总页数: ${pdf.numPages}`);
+        }
 
         // 获取指定页面
+        console.log(`[PDFPage] 开始获取页面 ${pageNumber}`);
         const page = await pdf.getPage(pageNumber);
+        console.log(`[PDFPage] 页面 ${pageNumber} 获取成功`);
 
-        // 获取canvas上下文
-        const canvas = canvasRef.current;
-        const context = canvas.getContext('2d');
-        if (!context) return;
+        // 创建独立的canvas用于渲染
+        const offscreenCanvas = document.createElement('canvas');
+        const context = offscreenCanvas.getContext('2d');
+        if (!context) {
+          console.error(`[PDFPage] 无法获取canvas上下文，页面 ${pageNumber}`);
+          return;
+        }
 
         // 计算缩放比例以适应容器
-        const containerWidth = canvas.parentElement?.clientWidth || 400;
-        const containerHeight = canvas.parentElement?.clientHeight || 600;
+        const containerWidth = canvasRef.current?.parentElement?.clientWidth || 400;
+        const containerHeight = canvasRef.current?.parentElement?.clientHeight || 600;
+        console.log(`[PDFPage] 容器尺寸: ${containerWidth}x${containerHeight}, 页面 ${pageNumber}`);
 
         const viewport = page.getViewport({ scale: 1 });
         const scale = Math.min(containerWidth / viewport.width, containerHeight / viewport.height);
         const scaledViewport = page.getViewport({ scale });
 
-        // 设置canvas尺寸
-        canvas.width = scaledViewport.width;
-        canvas.height = scaledViewport.height;
+        console.log(`[PDFPage] 原始视口: ${viewport.width}x${viewport.height}, 缩放比例: ${scale}, 页面 ${pageNumber}`);
 
-        // 渲染页面
+        // 设置offscreen canvas尺寸
+        offscreenCanvas.width = scaledViewport.width;
+        offscreenCanvas.height = scaledViewport.height;
+        console.log(`[PDFPage] Offscreen Canvas尺寸设置: ${offscreenCanvas.width}x${offscreenCanvas.height}, 页面 ${pageNumber}`);
+
+        // 渲染页面到offscreen canvas
         const renderContext = {
           canvasContext: context,
           viewport: scaledViewport,
-          canvas: canvas,
+          canvas: offscreenCanvas,
         };
 
+        console.log(`[PDFPage] 开始渲染页面 ${pageNumber}`);
         await page.render(renderContext).promise;
+        console.log(`[PDFPage] 页面 ${pageNumber} 渲染完成`);
+
+        // 将渲染结果转换为图片URL
+        const imageDataUrl = offscreenCanvas.toDataURL('image/png');
+        setRenderedImage(imageDataUrl);
+
+        // 设置主canvas尺寸
+        if (canvasRef.current) {
+          canvasRef.current.width = scaledViewport.width;
+          canvasRef.current.height = scaledViewport.height;
+
+          // 将offscreen canvas的内容绘制到主canvas
+          const mainContext = canvasRef.current.getContext('2d');
+          if (mainContext) {
+            mainContext.drawImage(offscreenCanvas, 0, 0);
+          }
+        }
+
         setLoading(false);
 
       } catch (err) {
-        console.error('PDF渲染错误:', err);
-        setError('页面加载失败');
+        console.error(`[PDFPage] PDF渲染错误，页面 ${pageNumber}:`, err);
+        const errorMessage = err instanceof Error ? err.message : '未知错误';
+        setError(`页面 ${pageNumber} 加载失败: ${errorMessage}`);
         setLoading(false);
       }
     };

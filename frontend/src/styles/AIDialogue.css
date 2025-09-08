@@ -115,15 +115,16 @@
   margin-bottom: 20px;
   padding: 15px;
   border-radius: 15px;
-  max-width: 70%;
+  max-width: 80%;
   word-wrap: break-word;
   position: relative;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .user-message {
   background: linear-gradient(135deg, #667eea, #764ba2);
   color: white;
-  margin-left: auto;
   border-bottom-right-radius: 5px;
   box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
 }
@@ -131,7 +132,6 @@
 .assistant-message {
   background: #f8f9fa;
   color: #333;
-  margin-right: auto;
   border-bottom-left-radius: 5px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }

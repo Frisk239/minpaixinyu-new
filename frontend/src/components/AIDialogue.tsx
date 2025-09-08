@@ -199,7 +199,7 @@ Hello～ 我是你们的闽派文化小伙伴「闽仔」！🔥
               value={inputMessage}
               onChange={(e) => setInputMessage(e.target.value)}
               onKeyPress={handleKeyPress}
-              placeholder="问问闽仔关于福建文化的问题吧..."
+              placeholder="问问闽仔关于闽派文化的问题吧..."
               className="message-input"
               rows={1}
               disabled={isLoading}
