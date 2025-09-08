@@ -1,0 +1,207 @@
+.map-container {
+  max-width: 1000px;
+  margin: 20px auto;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.map-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+.map-header h2 {
+  margin: 0;
+  color: #333;
+  font-family: 'FangZhengFengYaKaiSong', serif;
+  font-size: 24px;
+}
+
+.map-legend {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #666;
+  font-family: 'FangZhengFengYaKaiSong', serif;
+}
+
+.color-box {
+  width: 16px;
+  height: 16px;
+  border-radius: 3px;
+  border: 1px solid #ccc;
+}
+
+.color-box.explored {
+  background-color: #DAA520; /* 米黄色 */
+}
+
+.color-box.unexplored {
+  background-color: #808080; /* 灰色 */
+}
+
+.special-indicator {
+  color: #FFD700;
+  font-weight: bold;
+}
+
+.map-svg-container {
+  display: flex;
+  justify-content: center;
+  margin: 20px 0;
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 20px;
+  border: 2px solid #e9ecef;
+  min-height: 650px; /* 增加最小高度，确保地图完全显示 */
+}
+
+.map-svg-container svg {
+  border-radius: 5px;
+  background: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.city-path {
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.city-path:hover {
+  filter: brightness(1.1);
+  stroke-width: 2px !important;
+}
+
+.lock-icon {
+  pointer-events: none;
+  filter: drop-shadow(1px 1px 2px rgba(0, 0, 0, 0.3));
+}
+
+.map-tooltip {
+  position: absolute;
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-size: 14px;
+  font-family: 'FangZhengFengYaKaiSong', serif;
+  pointer-events: none;
+  z-index: 1000;
+  max-width: 200px;
+  word-wrap: break-word;
+}
+
+.map-tooltip div {
+  margin: 2px 0;
+}
+
+.map-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 400px;
+  color: #666;
+  font-family: 'FangZhengFengYaKaiSong', serif;
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #DAA520;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 20px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.map-instructions {
+  margin-top: 20px;
+  padding: 15px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border-left: 4px solid #DAA520;
+}
+
+.map-instructions p {
+  margin: 5px 0;
+  color: #666;
+  font-size: 14px;
+  font-family: 'FangZhengFengYaKaiSong', serif;
+  line-height: 1.5;
+}
+
+/* 响应式设计 */
+@media (max-width: 1024px) {
+  .map-container {
+    margin: 15px;
+    padding: 15px;
+  }
+
+  .map-svg-container {
+    padding: 15px;
+  }
+
+  .map-svg-container svg {
+    width: 100%;
+    height: auto;
+  }
+}
+
+@media (max-width: 768px) {
+  .map-header {
+    flex-direction: column;
+    gap: 15px;
+    align-items: flex-start;
+  }
+
+  .map-legend {
+    flex-wrap: wrap;
+    gap: 15px;
+  }
+
+  .map-header h2 {
+    font-size: 20px;
+  }
+
+  .map-instructions {
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 480px) {
+  .map-container {
+    margin: 10px;
+    padding: 10px;
+  }
+
+  .map-svg-container {
+    padding: 10px;
+  }
+
+  .legend-item {
+    font-size: 12px;
+  }
+
+  .map-header h2 {
+    font-size: 18px;
+  }
+}

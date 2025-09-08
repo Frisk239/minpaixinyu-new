@@ -1,0 +1,16 @@
+{
+  "short_name": "闽派新语",
+  "name": "闽派新语 - 文化学习平台",
+  "icons": [
+    {
+      "src": "http://localhost:5000/static/image/logo.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    }
+  ],
+  "start_url": "/",
+  "display": "standalone",
+  "theme_color": "#8B4513",
+  "background_color": "#ffffff",
+  "description": "社会历史学院同学创作的文化学习平台"
+}

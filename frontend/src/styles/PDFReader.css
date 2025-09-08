@@ -1,0 +1,308 @@
+.pdf-reader-container {
+  position: relative;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* 背景图片 */
+.pdf-reader-background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+}
+
+.pdf-reader-background .background-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: brightness(0.7);
+}
+
+/* 内容区域 */
+.pdf-reader-content {
+  position: relative;
+  z-index: 1;
+  padding: 80px 20px 40px; /* 为导航栏留出空间 */
+  max-width: 1400px;
+  margin: 0 auto;
+  min-height: calc(100vh - 120px);
+  display: flex;
+  flex-direction: column;
+}
+
+/* 返回按钮 */
+.back-btn {
+  align-self: flex-start;
+  background: rgba(139, 69, 19, 0.9);
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 25px;
+  font-size: 16px;
+  font-family: 'FangZhengFengYaKaiSong', serif;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(139, 69, 19, 0.3);
+  margin-bottom: 20px;
+}
+
+.back-btn:hover {
+  background: rgba(139, 69, 19, 1);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(139, 69, 19, 0.4);
+}
+
+/* PDF显示区域 */
+.pdf-display {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 20px 0;
+}
+
+.pdf-pages {
+  display: flex;
+  gap: 0px; /* 移除间距，让两页紧密连接 */
+  perspective: 1500px;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.pdf-pages.animating {
+  transform: rotateY(5deg) scale(0.98);
+  opacity: 0.8;
+}
+
+.pdf-page {
+  width: 400px;
+  height: 600px;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  position: relative;
+  overflow: hidden;
+  transform-style: preserve-3d;
+  transition: all 0.3s ease;
+}
+
+.pdf-page:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+}
+
+.left-page {
+  transform: rotateY(-2deg);
+}
+
+.right-page {
+  transform: rotateY(2deg);
+}
+
+.page-content {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #f8f9fa, #ffffff);
+  border: 2px solid #e9ecef;
+  border-radius: 10px;
+}
+
+.page-placeholder {
+  text-align: center;
+  color: #6c757d;
+  font-family: 'FangZhengFengYaKaiSong', serif;
+}
+
+.page-placeholder p {
+  font-size: 24px;
+  font-weight: bold;
+  margin: 0 0 10px 0;
+  color: #495057;
+}
+
+.page-placeholder small {
+  font-size: 14px;
+  opacity: 0.7;
+}
+
+/* 翻页动画 */
+@keyframes pageTurn {
+  0% {
+    transform: rotateY(0deg) scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: rotateY(90deg) scale(0.95);
+    opacity: 0.5;
+  }
+  100% {
+    transform: rotateY(0deg) scale(1);
+    opacity: 1;
+  }
+}
+
+.pdf-pages.animating .pdf-page {
+  animation: pageTurn 0.6s ease-in-out;
+}
+
+/* 控制按钮区域 */
+.pdf-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 40px;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(10px);
+  border-radius: 15px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+  margin-top: 20px;
+}
+
+.control-btn {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+  border: none;
+  padding: 15px 25px;
+  border-radius: 25px;
+  font-size: 16px;
+  font-family: 'FangZhengFengYaKaiSong', serif;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+  min-width: 120px;
+}
+
+.control-btn:hover:not(:disabled) {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+}
+
+.control-btn:disabled {
+  background: #6c757d;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: 0 2px 8px rgba(108, 117, 125, 0.3);
+}
+
+.page-info {
+  text-align: center;
+  color: #495057;
+  font-family: 'FangZhengFengYaKaiSong', serif;
+}
+
+.page-info span {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.page-info small {
+  font-size: 12px;
+  color: #6c757d;
+}
+
+/* 响应式设计 */
+@media (max-width: 1200px) {
+  .pdf-page {
+    width: 350px;
+    height: 525px;
+  }
+
+  .pdf-pages {
+    gap: 10px; /* 中等屏幕保持小间距 */
+  }
+}
+
+@media (max-width: 1024px) {
+  .pdf-page {
+    width: 300px;
+    height: 450px;
+  }
+
+  .pdf-controls {
+    gap: 30px;
+  }
+
+  .control-btn {
+    padding: 12px 20px;
+    font-size: 14px;
+    min-width: 100px;
+  }
+}
+
+@media (max-width: 768px) {
+  .pdf-reader-content {
+    padding: 70px 15px 30px;
+  }
+
+  .pdf-display {
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .pdf-pages {
+    flex-direction: column;
+    gap: 20px; /* 移动端保持适当间距 */
+    perspective: none;
+  }
+
+  .pdf-page {
+    width: 280px;
+    height: 420px;
+  }
+
+  .left-page,
+  .right-page {
+    transform: none;
+  }
+
+  .pdf-controls {
+    flex-direction: column;
+    gap: 15px;
+    padding: 15px;
+  }
+
+  .control-btn {
+    width: 100%;
+    max-width: 200px;
+  }
+
+  .back-btn {
+    align-self: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .pdf-page {
+    width: 250px;
+    height: 375px;
+  }
+
+  .page-placeholder p {
+    font-size: 20px;
+  }
+
+  .page-placeholder small {
+    font-size: 12px;
+  }
+
+  .pdf-controls {
+    padding: 10px;
+  }
+
+  .control-btn {
+    padding: 10px 15px;
+    font-size: 14px;
+  }
+
+  .page-info span {
+    font-size: 16px;
+  }
+}

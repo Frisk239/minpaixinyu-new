@@ -1,0 +1,27 @@
+.App {
+  text-align: center;
+}
+
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  font-size: 18px;
+  color: #666;
+}
+
+/* 全局样式覆盖 */
+* {
+  margin: 0;
+  padding: 0;
+}
+
+/* 确保页面内容不被导航栏遮挡 */
+body {
+  padding-top: 0; /* 导航栏是固定的，不需要额外padding */
+}
+
+.page-content {
+  padding-top: 60px; /* 为固定导航栏留出空间 */
+}
