@@ -1,15 +1,106 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import * as pdfjsLib from 'pdfjs-dist';
 import '../styles/PDFReader.css';
 
+// 配置PDF.js worker
+pdfjsLib.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjsLib.version}/build/pdf.worker.min.js`;
+
 interface PDFReaderProps {}
+
+interface PDFPageProps {
+  pageNumber: number;
+  pdfUrl: string;
+}
+
+const PDFPage: React.FC<PDFPageProps> = ({ pageNumber, pdfUrl }) => {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const renderPage = async () => {
+      if (!canvasRef.current) return;
+
+      try {
+        setLoading(true);
+        setError(null);
+
+        // 加载PDF文档
+        const loadingTask = pdfjsLib.getDocument(pdfUrl);
+        const pdf = await loadingTask.promise;
+
+        // 获取指定页面
+        const page = await pdf.getPage(pageNumber);
+
+        // 获取canvas上下文
+        const canvas = canvasRef.current;
+        const context = canvas.getContext('2d');
+        if (!context) return;
+
+        // 计算缩放比例以适应容器
+        const containerWidth = canvas.parentElement?.clientWidth || 400;
+        const containerHeight = canvas.parentElement?.clientHeight || 600;
+
+        const viewport = page.getViewport({ scale: 1 });
+        const scale = Math.min(containerWidth / viewport.width, containerHeight / viewport.height);
+        const scaledViewport = page.getViewport({ scale });
+
+        // 设置canvas尺寸
+        canvas.width = scaledViewport.width;
+        canvas.height = scaledViewport.height;
+
+        // 渲染页面
+        const renderContext = {
+          canvasContext: context,
+          viewport: scaledViewport,
+          canvas: canvas,
+        };
+
+        await page.render(renderContext).promise;
+        setLoading(false);
+
+      } catch (err) {
+        console.error('PDF渲染错误:', err);
+        setError('页面加载失败');
+        setLoading(false);
+      }
+    };
+
+    renderPage();
+  }, [pageNumber, pdfUrl]);
+
+  if (error) {
+    return (
+      <div className="pdf-error">
+        <p>{error}</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="pdf-page-container">
+      {loading && (
+        <div className="pdf-loading">
+          <p>加载中...</p>
+        </div>
+      )}
+      <canvas
+        ref={canvasRef}
+        className="pdf-canvas"
+        style={{ display: loading ? 'none' : 'block' }}
+      />
+    </div>
+  );
+};
 
 const PDFReader: React.FC<PDFReaderProps> = () => {
   const { imageIndex } = useParams<{ imageIndex: string }>();
   const navigate = useNavigate();
-  const [pageNumber, setPageNumber] = useState<number>(1);
+  const [currentPageSet, setCurrentPageSet] = useState<number>(0);
   const [pageRange, setPageRange] = useState({ start: 1, end: 8 });
   const [isAnimating, setIsAnimating] = useState(false);
+  const [animationDirection, setAnimationDirection] = useState<'left' | 'right' | null>(null);
 
   // 根据imageIndex设置页数范围
   useEffect(() => {
@@ -48,31 +139,52 @@ const PDFReader: React.FC<PDFReaderProps> = () => {
     }
 
     setPageRange({ start: startPage, end: endPage });
-    setPageNumber(startPage);
+    setCurrentPageSet(0); // 重置到第一组页面
   }, [imageIndex]);
 
+  // 计算当前显示的页面
+  const getCurrentPages = () => {
+    const leftPage = pageRange.start + (currentPageSet * 2);
+    const rightPage = leftPage + 1;
+    return { leftPage, rightPage };
+  };
+
+  const { leftPage, rightPage } = getCurrentPages();
+
+  // 计算总的页面组数
+  const totalPageSets = Math.ceil((pageRange.end - pageRange.start + 1) / 2);
+
   const handlePrevPage = () => {
-    if (pageNumber > pageRange.start && !isAnimating) {
+    if (currentPageSet > 0 && !isAnimating) {
+      setAnimationDirection('right'); // 向右翻页动画
       setIsAnimating(true);
       setTimeout(() => {
-        setPageNumber(prev => prev - 2);
+        setCurrentPageSet(prev => prev - 1);
         setIsAnimating(false);
-      }, 300);
+        setAnimationDirection(null);
+      }, 600);
     }
   };
 
   const handleNextPage = () => {
-    if (pageNumber < pageRange.end - 1 && !isAnimating) {
+    if (currentPageSet < totalPageSets - 1 && !isAnimating) {
+      setAnimationDirection('left'); // 向左翻页动画
       setIsAnimating(true);
       setTimeout(() => {
-        setPageNumber(prev => prev + 2);
+        setCurrentPageSet(prev => prev + 1);
         setIsAnimating(false);
-      }, 300);
+        setAnimationDirection(null);
+      }, 600);
     }
   };
 
   const handleBack = () => {
     navigate('/audio-book');
+  };
+
+  // 判断是否需要显示空白页面
+  const shouldShowBlankPage = () => {
+    return rightPage > pageRange.end;
   };
 
   return (
@@ -95,39 +207,29 @@ const PDFReader: React.FC<PDFReaderProps> = () => {
 
         {/* PDF显示区域 */}
         <div className="pdf-display">
-          <div className={`pdf-pages ${isAnimating ? 'animating' : ''}`}>
+          <div className={`pdf-pages ${isAnimating ? 'animating' : ''} ${animationDirection ? `flip-${animationDirection}` : ''}`}>
             {/* 左侧页面 */}
             <div className="pdf-page left-page">
-              <div className="page-content">
-                <div className="page-placeholder">
-                  <p>第 {pageNumber} 页</p>
-                  <small>PDF内容将在此处显示</small>
-                  <div className="pdf-iframe-container">
-                    <iframe
-                      src={`http://localhost:5000/static/text.pdf#page=${pageNumber}`}
-                      className="pdf-iframe"
-                      title={`第${pageNumber}页`}
-                    />
-                  </div>
-                </div>
-              </div>
+              <PDFPage
+                pageNumber={leftPage}
+                pdfUrl="http://localhost:5000/static/text.pdf"
+              />
             </div>
 
             {/* 右侧页面 */}
             <div className="pdf-page right-page">
-              <div className="page-content">
-                <div className="page-placeholder">
-                  <p>第 {pageNumber + 1} 页</p>
-                  <small>PDF内容将在此处显示</small>
-                  <div className="pdf-iframe-container">
-                    <iframe
-                      src={`http://localhost:5000/static/text.pdf#page=${pageNumber + 1}`}
-                      className="pdf-iframe"
-                      title={`第${pageNumber + 1}页`}
-                    />
+              {!shouldShowBlankPage() ? (
+                <PDFPage
+                  pageNumber={rightPage}
+                  pdfUrl="http://localhost:5000/static/text.pdf"
+                />
+              ) : (
+                <div className="blank-page">
+                  <div className="blank-content">
+                    <span>空白页</span>
                   </div>
                 </div>
-              </div>
+              )}
             </div>
           </div>
         </div>
@@ -137,21 +239,21 @@ const PDFReader: React.FC<PDFReaderProps> = () => {
           <button
             className="control-btn prev-btn"
             onClick={handlePrevPage}
-            disabled={pageNumber <= pageRange.start || isAnimating}
+            disabled={currentPageSet <= 0 || isAnimating}
           >
             ◀ 上一页
           </button>
 
           <div className="page-info">
-            <span>第 {pageNumber}-{Math.min(pageNumber + 1, pageRange.end)} 页</span>
+            <span>第 {leftPage}{!shouldShowBlankPage() ? `-${rightPage}` : ''} 页</span>
             <br />
-            <small>总范围: {pageRange.start}-{pageRange.end} 页</small>
+            <small>第 {currentPageSet + 1} / {totalPageSets} 组 · 总范围: {pageRange.start}-{pageRange.end} 页</small>
           </div>
 
           <button
             className="control-btn next-btn"
             onClick={handleNextPage}
-            disabled={pageNumber >= pageRange.end - 1 || isAnimating}
+            disabled={currentPageSet >= totalPageSets - 1 || isAnimating}
           >
             下一页 ▶
           </button>
