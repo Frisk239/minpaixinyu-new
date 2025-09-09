@@ -28,9 +28,9 @@ app.config['SESSION_TYPE'] = 'filesystem'  # 使用文件系统存储 session
 app.config['SESSION_PERMANENT'] = False
 app.config['SESSION_USE_SIGNER'] = True
 app.config['SESSION_KEY_PREFIX'] = 'minpaixinyu_'
-app.config['SESSION_COOKIE_SECURE'] = True  # HTTPS 环境下要求 secure cookies
+app.config['SESSION_COOKIE_SECURE'] = False  # 先设为 False 调试，生产环境设为 True
 app.config['SESSION_COOKIE_HTTPONLY'] = True  # 防止 XSS 攻击
-app.config['SESSION_COOKIE_SAMESITE'] = 'None'  # 允许跨域
+app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'  # 先用 Lax 调试跨域问题
 
 # 初始化扩展
 db = SQLAlchemy(app)
