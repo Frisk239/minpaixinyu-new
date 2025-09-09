@@ -27,7 +27,7 @@ const Navbar: React.FC<NavbarProps> = ({ onLogout }) => {
 
         {/* 导航链接 */}
         <div className="navbar-links">
-          <Link to="/home" className="nav-link">文化概览</Link>
+          <Link to="/home" className="nav-link">文化云游</Link>
           <Link to="/ai-dialogue" className="nav-link">AI对话</Link>
           <Link to="/audio-book" className="nav-link">有声读物</Link>
           <Link to="/home" className="nav-link">线上桌游</Link>

@@ -75,7 +75,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
 
           {/* 导航链接 */}
           <div className="navbar-menu">
-            <span className="navbar-item">文化概览</span>
+            <span className="navbar-item">文化云游</span>
             <span className="navbar-item">AI对话</span>
             <span className="navbar-item">有声读物</span>
             <span className="navbar-item">线上桌游</span>

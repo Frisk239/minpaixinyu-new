@@ -103,7 +103,7 @@ const City: React.FC = () => {
       <div className="city-error">
         <h2>城市信息加载失败</h2>
         <button onClick={goBackToHome} className="back-btn">
-          返回文化概览
+          返回文化云游
         </button>
       </div>
     );
@@ -162,7 +162,7 @@ const City: React.FC = () => {
             onClick={goBackToHome}
             className="back-btn"
           >
-            返回文化概览
+            返回文化云游
           </button>
         </div>
       </div>
