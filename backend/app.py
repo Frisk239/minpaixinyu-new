@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify, session
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
+from flask_session import Session
 from werkzeug.security import generate_password_hash, check_password_hash
 import os
 from datetime import datetime
@@ -17,14 +18,23 @@ static_dir = os.path.join(os.path.dirname(__file__), '..', 'frontend', 'static')
 app.static_folder = static_dir
 
 # 配置
-app.config['SECRET_KEY'] = 'your-secret-key-here'  # 在生产环境中应该使用环境变量
+app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'your-secret-key-here')  # 使用环境变量
 db_path = os.path.join(os.path.dirname(__file__), 'data', 'users.db')
 app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
+# Session 配置 - 支持公网环境
+app.config['SESSION_TYPE'] = 'filesystem'  # 使用文件系统存储 session
+app.config['SESSION_PERMANENT'] = False
+app.config['SESSION_USE_SIGNER'] = True
+app.config['SESSION_KEY_PREFIX'] = 'minpaixinyu_'
+
 # 初始化扩展
 db = SQLAlchemy(app)
-CORS(app, supports_credentials=True, origins=["http://localhost:3000"])
+Session(app)  # 初始化 Flask-Session
+
+# CORS 配置 - 允许所有域名（生产环境）
+CORS(app, supports_credentials=True, origins=["*"])
 
 # 用户模型
 class User(db.Model):
