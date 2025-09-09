@@ -9,6 +9,9 @@ import City from './components/City';
 import AIDialogue from './components/AIDialogue';
 import AudioBook from './components/AudioBook';
 import PDFReader from './components/PDFReader';
+import QuizSelection from './components/QuizSelection';
+import Quiz from './components/Quiz';
+import QuizResult from './components/QuizResult';
 import Navbar from './components/Navbar';
 import './App.css';
 
@@ -185,6 +188,44 @@ function App() {
             element={
               authState.isAuthenticated ?
                 <PDFReader /> :
+                <Navigate to="/" replace />
+            }
+          />
+          <Route
+            path="/quiz"
+            element={
+              authState.isAuthenticated ?
+                <QuizSelection /> :
+                <Navigate to="/" replace />
+            }
+          />
+          <Route
+            path="/quiz/:cityName"
+            element={
+              authState.isAuthenticated ?
+                <Quiz
+                  cityName=""
+                  onComplete={(score, total) => {}}
+                  onBack={() => {}}
+                /> :
+                <Navigate to="/" replace />
+            }
+          />
+          <Route
+            path="/quiz-result/:cityName"
+            element={
+              authState.isAuthenticated ?
+                <QuizResult
+                  cityName=""
+                  score={0}
+                  total={0}
+                  answers={[]}
+                  correctAnswers={[]}
+                  questionIds={[]}
+                  onRetry={() => {}}
+                  onBack={() => {}}
+                  onViewStats={() => {}}
+                /> :
                 <Navigate to="/" replace />
             }
           />

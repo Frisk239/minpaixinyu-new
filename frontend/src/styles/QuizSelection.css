@@ -1,0 +1,386 @@
+/* 答题选择页面样式 */
+.quiz-selection-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif;
+}
+
+/* 头部样式 */
+.selection-header {
+  text-align: center;
+  margin-bottom: 40px;
+  color: white;
+}
+
+.selection-header h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 15px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.selection-header p {
+  font-size: 1.2rem;
+  opacity: 0.9;
+  margin-bottom: 20px;
+}
+
+.back-btn {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  padding: 10px 20px;
+  border-radius: 25px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  backdrop-filter: blur(10px);
+}
+
+.back-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: translateY(-2px);
+}
+
+/* 城市网格样式 */
+.cities-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 30px;
+  margin-bottom: 50px;
+}
+
+.city-card {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 20px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.4s ease;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+  backdrop-filter: blur(10px);
+  animation: fadeInUp 0.6s ease-out forwards;
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+@keyframes fadeInUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.city-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+}
+
+/* 城市图片容器 */
+.city-image-container {
+  position: relative;
+  height: 200px;
+  overflow: hidden;
+}
+
+.city-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+.city-card:hover .city-image {
+  transform: scale(1.1);
+}
+
+.city-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.8), rgba(118, 75, 162, 0.8));
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.city-card:hover .city-overlay {
+  opacity: 1;
+}
+
+.city-name {
+  font-size: 1.8rem;
+  font-weight: 700;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  margin-bottom: 10px;
+}
+
+.question-count {
+  background: rgba(255, 255, 255, 0.2);
+  padding: 5px 15px;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  backdrop-filter: blur(10px);
+}
+
+/* 城市内容 */
+.city-content {
+  padding: 25px;
+}
+
+.city-content h3 {
+  margin: 0 0 10px 0;
+  color: #2c3e50;
+  font-size: 1.4rem;
+  font-weight: 600;
+}
+
+.city-content p {
+  color: #666;
+  margin: 0 0 15px 0;
+  line-height: 1.5;
+  font-size: 0.95rem;
+}
+
+.city-stats {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.stat-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: #666;
+  font-size: 0.85rem;
+  background: #f8f9fa;
+  padding: 5px 10px;
+  border-radius: 15px;
+}
+
+.stat-icon {
+  font-size: 0.9rem;
+}
+
+/* 城市操作 */
+.city-action {
+  padding: 0 25px 25px 25px;
+}
+
+.start-quiz-btn {
+  width: 100%;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+  border: none;
+  padding: 15px 25px;
+  border-radius: 25px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+.start-quiz-btn:hover {
+  background: linear-gradient(135deg, #5a67d8, #6a1b9a);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+}
+
+.arrow {
+  font-size: 1.2rem;
+  transition: transform 0.3s ease;
+}
+
+.start-quiz-btn:hover .arrow {
+  transform: translateX(5px);
+}
+
+/* 答题说明样式 */
+.quiz-instructions {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 20px;
+  padding: 30px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+  backdrop-filter: blur(10px);
+}
+
+.quiz-instructions h3 {
+  margin: 0 0 25px 0;
+  color: #2c3e50;
+  font-size: 1.6rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+.instructions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 25px;
+}
+
+.instruction-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 15px;
+  padding: 20px;
+  background: #f8f9fa;
+  border-radius: 15px;
+  transition: all 0.3s ease;
+}
+
+.instruction-item:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+}
+
+.instruction-icon {
+  font-size: 2.5rem;
+  flex-shrink: 0;
+}
+
+.instruction-content h4 {
+  margin: 0 0 8px 0;
+  color: #2c3e50;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.instruction-content p {
+  margin: 0;
+  color: #666;
+  line-height: 1.5;
+  font-size: 0.9rem;
+}
+
+/* 加载状态 */
+.loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  color: white;
+}
+
+.spinner {
+  width: 60px;
+  height: 60px;
+  border: 4px solid rgba(255, 255, 255, 0.3);
+  border-top: 4px solid white;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 20px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.loading p {
+  font-size: 1.2rem;
+  opacity: 0.9;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .quiz-selection-container {
+    padding: 15px;
+  }
+
+  .selection-header h1 {
+    font-size: 2rem;
+  }
+
+  .selection-header p {
+    font-size: 1rem;
+  }
+
+  .cities-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .city-card {
+    max-width: 100%;
+  }
+
+  .city-image-container {
+    height: 180px;
+  }
+
+  .city-name {
+    font-size: 1.5rem;
+  }
+
+  .city-content {
+    padding: 20px;
+  }
+
+  .city-content h3 {
+    font-size: 1.2rem;
+  }
+
+  .city-stats {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .instructions-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .instruction-item {
+    padding: 15px;
+  }
+
+  .instruction-icon {
+    font-size: 2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .selection-header h1 {
+    font-size: 1.8rem;
+  }
+
+  .city-image-container {
+    height: 150px;
+  }
+
+  .city-name {
+    font-size: 1.3rem;
+  }
+
+  .start-quiz-btn {
+    padding: 12px 20px;
+    font-size: 0.95rem;
+  }
+
+  .quiz-instructions {
+    padding: 20px;
+  }
+
+  .quiz-instructions h3 {
+    font-size: 1.4rem;
+  }
+}

@@ -31,7 +31,7 @@ const Navbar: React.FC<NavbarProps> = ({ onLogout }) => {
           <Link to="/ai-dialogue" className="nav-link">AI对话</Link>
           <Link to="/audio-book" className="nav-link">有声读物</Link>
           <Link to="/home" className="nav-link">线上桌游</Link>
-          <Link to="/home" className="nav-link">互动答题</Link>
+          <Link to="/quiz" className="nav-link">互动答题</Link>
           <Link to="/home" className="nav-link">个人中心</Link>
         </div>
 
