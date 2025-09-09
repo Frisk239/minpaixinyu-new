@@ -23,18 +23,26 @@ db_path = os.path.join(os.path.dirname(__file__), 'data', 'users.db')
 app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-# Session 配置 - 支持公网环境
+# Session 配置 - 支持公网环境和 HTTPS
 app.config['SESSION_TYPE'] = 'filesystem'  # 使用文件系统存储 session
 app.config['SESSION_PERMANENT'] = False
 app.config['SESSION_USE_SIGNER'] = True
 app.config['SESSION_KEY_PREFIX'] = 'minpaixinyu_'
+app.config['SESSION_COOKIE_SECURE'] = True  # HTTPS 环境下要求 secure cookies
+app.config['SESSION_COOKIE_HTTPONLY'] = True  # 防止 XSS 攻击
+app.config['SESSION_COOKIE_SAMESITE'] = 'None'  # 允许跨域
 
 # 初始化扩展
 db = SQLAlchemy(app)
 Session(app)  # 初始化 Flask-Session
 
-# CORS 配置 - 允许所有域名（生产环境）
-CORS(app, supports_credentials=True, origins=["*"])
+# CORS 配置 - 允许公网域名
+cors_origins = [
+    "http://localhost:3000",  # 开发环境
+    "https://frp-say.com:39668",  # 生产环境
+    "https://frp-say.com"  # 备用域名
+]
+CORS(app, supports_credentials=True, origins=cors_origins)
 
 # 用户模型
 class User(db.Model):

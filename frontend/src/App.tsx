@@ -12,9 +12,10 @@ import PDFReader from './components/PDFReader';
 import Navbar from './components/Navbar';
 import './App.css';
 
-// API 配置 - 开发环境使用本地后端，生产环境使用相对路径
+// API 配置 - 开发环境使用本地后端，生产环境使用公网地址
 const isDevelopment = process.env.NODE_ENV === 'development';
-axios.defaults.baseURL = isDevelopment ? 'http://localhost:5000' : '';
+const isProduction = process.env.NODE_ENV === 'production';
+axios.defaults.baseURL = isDevelopment ? 'http://localhost:5000' : (isProduction ? 'https://frp-say.com:39668' : '');
 axios.defaults.withCredentials = true; // 允许发送cookies
 
 // 响应拦截器 - 处理认证错误
