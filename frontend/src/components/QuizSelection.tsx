@@ -17,34 +17,34 @@ const QuizSelection: React.FC = () => {
   // 城市信息
   const cityData: CityInfo[] = [
     {
-      name: '福州市',
-      description: '历史文化名城，拥有三坊七巷等著名景点',
+      name: '福州候官文化',
+      description: '福州传统文化的重要载体，展现闽都文化的独特魅力',
       image: 'http://localhost:5000/static/image/fuzhou.PNG',
-      questionCount: 20
+      questionCount: 5
     },
     {
-      name: '泉州市',
-      description: '海上丝绸之路起点，世界文化遗产',
+      name: '泉州海丝文化',
+      description: '古代海上丝绸之路的重要港口，多元文化交融之地',
       image: 'http://localhost:5000/static/image/quanzhou.PNG',
-      questionCount: 20
+      questionCount: 5
     },
     {
-      name: '南平市',
-      description: '武夷山所在地，生态旅游胜地',
+      name: '南平朱子文化',
+      description: '理学大师朱熹的故乡，儒家文化的重要传承地',
       image: 'http://localhost:5000/static/image/nanping.PNG',
-      questionCount: 20
+      questionCount: 5
     },
     {
-      name: '龙岩市',
-      description: '客家文化发源地，古田会议旧址',
+      name: '龙岩红色文化',
+      description: '中国革命的重要策源地，红色文化的精神家园',
       image: 'http://localhost:5000/static/image/longyan.PNG',
-      questionCount: 20
+      questionCount: 5
     },
     {
-      name: '莆田市',
-      description: '妈祖文化发源地，莆仙戏之乡',
+      name: '莆田妈祖文化',
+      description: '妈祖文化的发源地，海洋文化的精神象征',
       image: 'http://localhost:5000/static/image/putian.PNG',
-      questionCount: 20
+      questionCount: 5
     }
   ];
 
@@ -59,11 +59,11 @@ const QuizSelection: React.FC = () => {
   const handleCitySelect = (cityName: string) => {
     // 将城市名称转换为对应的英文标识
     const cityMapping: { [key: string]: string } = {
-      '福州市': 'fuzhou',
-      '泉州市': 'quanzhou',
-      '南平市': 'nanping',
-      '龙岩市': 'longyan',
-      '莆田市': 'putian'
+      '福州候官文化': 'fuzhou',
+      '泉州海丝文化': 'quanzhou',
+      '南平朱子文化': 'nanping',
+      '龙岩红色文化': 'longyan',
+      '莆田妈祖文化': 'putian'
     };
 
     const cityKey = cityMapping[cityName] || cityName;
@@ -87,11 +87,20 @@ const QuizSelection: React.FC = () => {
 
   return (
     <div className="quiz-selection-container">
+      {/* 背景图片 */}
+      <div className="quiz-selection-background">
+        <img
+          src="http://localhost:5000/static/image/index.png"
+          alt="背景图片"
+          className="quiz-selection-background-img"
+        />
+      </div>
+
       {/* 头部 */}
       <div className="selection-header">
         <button onClick={handleBack} className="back-btn">← 返回首页</button>
         <h1>选择答题城市</h1>
-        <p>请选择您想要测试的城市，每个城市都有20道精选题目</p>
+        <p>请选择您想要测试的城市，每个城市随机抽取5道精选题目</p>
       </div>
 
       {/* 城市选择网格 */}
@@ -129,7 +138,7 @@ const QuizSelection: React.FC = () => {
                 </span>
                 <span className="stat-item">
                   <span className="stat-icon">⏱️</span>
-                  约10分钟
+                  约3分钟
                 </span>
               </div>
             </div>
@@ -144,43 +153,7 @@ const QuizSelection: React.FC = () => {
         ))}
       </div>
 
-      {/* 答题说明 */}
-      <div className="quiz-instructions">
-        <h3>答题说明</h3>
-        <div className="instructions-grid">
-          <div className="instruction-item">
-            <div className="instruction-icon">🎯</div>
-            <div className="instruction-content">
-              <h4>题目类型</h4>
-              <p>单选题形式，每个题目4个选项</p>
-            </div>
-          </div>
 
-          <div className="instruction-item">
-            <div className="instruction-icon">📊</div>
-            <div className="instruction-content">
-              <h4>评分标准</h4>
-              <p>60分及格，80分良好，90分优秀</p>
-            </div>
-          </div>
-
-          <div className="instruction-item">
-            <div className="instruction-icon">🔄</div>
-            <div className="instruction-content">
-              <h4>答题机会</h4>
-              <p>可多次答题，每次都有新的题目顺序</p>
-            </div>
-          </div>
-
-          <div className="instruction-item">
-            <div className="instruction-icon">🏆</div>
-            <div className="instruction-content">
-              <h4>成就系统</h4>
-              <p>答题通过后解锁城市探索权限</p>
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
   );
 };

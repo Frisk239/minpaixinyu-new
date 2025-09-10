@@ -32,14 +32,7 @@ const Navbar: React.FC<NavbarProps> = ({ onLogout }) => {
           <Link to="/audio-book" className="nav-link">有声读物</Link>
           <Link to="/home" className="nav-link">线上桌游</Link>
           <Link to="/quiz" className="nav-link">互动答题</Link>
-          <Link to="/home" className="nav-link">个人中心</Link>
-        </div>
-
-        {/* 登出按钮 */}
-        <div className="navbar-actions">
-          <button onClick={handleLogout} className="logout-btn">
-            退出登录
-          </button>
+          <Link to="/profile" className="nav-link">个人中心</Link>
         </div>
       </div>
     </nav>

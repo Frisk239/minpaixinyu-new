@@ -162,6 +162,70 @@ def check_auth():
         'user': user.to_dict()
     }), 200
 
+# 用户个人中心相关API
+@app.route('/api/user/change-password', methods=['POST'])
+def change_password():
+    """修改密码"""
+    user_id = session.get('user_id')
+    if not user_id:
+        return jsonify({'error': '未登录'}), 401
+
+    user = User.query.get(user_id)
+    if not user:
+        session.pop('user_id', None)
+        return jsonify({'error': '用户不存在'}), 401
+
+    data = request.get_json()
+    if not data or not data.get('current_password') or not data.get('new_password'):
+        return jsonify({'error': '缺少必要字段'}), 400
+
+    # 验证当前密码
+    if not user.check_password(data['current_password']):
+        return jsonify({'error': '当前密码错误'}), 400
+
+    # 验证新密码长度
+    if len(data['new_password']) < 6:
+        return jsonify({'error': '新密码长度至少6位'}), 400
+
+    # 更新密码
+    user.set_password(data['new_password'])
+    db.session.commit()
+
+    return jsonify({'message': '密码修改成功'}), 200
+
+@app.route('/api/user/delete-account', methods=['DELETE'])
+def delete_account():
+    """注销账号"""
+    user_id = session.get('user_id')
+    if not user_id:
+        return jsonify({'error': '未登录'}), 401
+
+    user = User.query.get(user_id)
+    if not user:
+        session.pop('user_id', None)
+        return jsonify({'error': '用户不存在'}), 401
+
+    # 清除session
+    session.pop('user_id', None)
+
+    # 删除用户的所有相关数据（但保留匿名统计）
+    try:
+        # 删除城市探索记录
+        UserCityExploration.query.filter_by(user_id=user_id).delete()
+
+        # 删除用户记录
+        db.session.delete(user)
+        db.session.commit()
+
+        return jsonify({
+            'message': '账号已成功注销，感谢您的使用',
+            'anonymous_stats_preserved': True
+        }), 200
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': '注销账号失败，请稍后重试'}), 500
+
 # 城市探索相关API
 @app.route('/api/city-explorations', methods=['GET'])
 def get_city_explorations():
@@ -312,6 +376,246 @@ def ai_chat():
             'error': 'AI服务暂时不可用，请稍后再试',
             'response': '抱歉，我现在有点小问题，请稍后再试试吧！😅'
         }), 500
+
+# 题目相关API
+@app.route('/api/questions/<city_name>', methods=['GET'])
+def get_questions(city_name):
+    """获取指定城市的题目"""
+    try:
+        # 城市名称映射
+        city_mapping = {
+            '福州市': 'fuzhou',
+            '泉州市': 'quanzhou',
+            '南平市': 'nanping',
+            '龙岩市': 'longyan',
+            '莆田市': 'putian',
+            # 新增文化名称映射
+            '福州候官文化': 'fuzhou',
+            '泉州海丝文化': 'quanzhou',
+            '南平朱子文化': 'nanping',
+            '龙岩红色文化': 'longyan',
+            '莆田妈祖文化': 'putian'
+        }
+
+        # 获取对应的文件名
+        city_key = city_mapping.get(city_name, city_name)
+        question_file = os.path.join(os.path.dirname(__file__), '..', 'frontend', f'{city_key}-question.txt')
+
+        if not os.path.exists(question_file):
+            return jsonify({'error': '题目文件不存在'}), 404
+
+        # 解析题目文件
+        questions = []
+        with open(question_file, 'r', encoding='utf-8') as f:
+            content = f.read()
+
+        # 按题目分割
+        question_blocks = content.strip().split('\n\n')
+
+        for i, block in enumerate(question_blocks, 1):
+            if not block.strip():
+                continue
+
+            lines = block.strip().split('\n')
+            if len(lines) < 6:  # 题目 + 4个选项 + 答案
+                continue
+
+            # 解析题目
+            question_text = lines[0].strip()
+            if not question_text:
+                continue
+
+            # 解析选项
+            options = {}
+            for j in range(1, 5):
+                if j < len(lines):
+                    line = lines[j].strip()
+                    if line and len(line) > 2:
+                        key = line[0]  # A, B, C, D
+                        value = line[2:].strip()  # 选项内容
+                        options[key] = value
+
+            # 解析答案
+            correct_answer = ''
+            for line in lines:
+                if line.startswith('答案：'):
+                    correct_answer = line.replace('答案：', '').strip()
+                    break
+
+            if options and correct_answer:
+                questions.append({
+                    'id': i,
+                    'city_name': city_name,
+                    'question_text': question_text,
+                    'options': options,
+                    'correct_answer': correct_answer
+                })
+
+        return jsonify({'questions': questions}), 200
+
+    except Exception as e:
+        print(f"获取题目失败: {str(e)}")
+        return jsonify({'error': '获取题目失败'}), 500
+
+@app.route('/api/questions/<city_name>/<int:question_id>/verify', methods=['POST'])
+def verify_answer(city_name, question_id):
+    """验证单题答案"""
+    try:
+        user_id = session.get('user_id')
+        if not user_id:
+            return jsonify({'error': '未登录'}), 401
+
+        data = request.get_json()
+        if not data or not data.get('answer'):
+            return jsonify({'error': '缺少答案'}), 400
+
+        user_answer = data['answer']
+
+        # 获取题目文件中的正确答案
+        city_mapping = {
+            '福州市': 'fuzhou',
+            '泉州市': 'quanzhou',
+            '南平市': 'nanping',
+            '龙岩市': 'longyan',
+            '莆田市': 'putian',
+            # 新增文化名称映射
+            '福州候官文化': 'fuzhou',
+            '泉州海丝文化': 'quanzhou',
+            '南平朱子文化': 'nanping',
+            '龙岩红色文化': 'longyan',
+            '莆田妈祖文化': 'putian'
+        }
+
+        city_key = city_mapping.get(city_name, city_name)
+        question_file = os.path.join(os.path.dirname(__file__), '..', 'frontend', f'{city_key}-question.txt')
+
+        if not os.path.exists(question_file):
+            return jsonify({'error': '题目文件不存在'}), 404
+
+        # 解析题目文件获取指定题目的正确答案
+        correct_answer = ''
+        with open(question_file, 'r', encoding='utf-8') as f:
+            content = f.read()
+
+        question_blocks = content.strip().split('\n\n')
+        if question_id <= len(question_blocks):
+            block = question_blocks[question_id - 1]
+            lines = block.strip().split('\n')
+            for line in lines:
+                if line.startswith('答案：'):
+                    correct_answer = line.replace('答案：', '').strip()
+                    break
+
+        if not correct_answer:
+            return jsonify({'error': '题目不存在'}), 404
+
+        is_correct = user_answer == correct_answer
+
+        return jsonify({
+            'is_correct': is_correct,
+            'correct_answer': correct_answer,
+            'user_answer': user_answer
+        }), 200
+
+    except Exception as e:
+        print(f"验证答案失败: {str(e)}")
+        return jsonify({'error': '验证失败'}), 500
+
+@app.route('/api/quiz/submit', methods=['POST'])
+def submit_quiz():
+    """提交答题结果"""
+    try:
+        user_id = session.get('user_id')
+        if not user_id:
+            return jsonify({'error': '未登录'}), 401
+
+        data = request.get_json()
+        if not data:
+            return jsonify({'error': '缺少数据'}), 400
+
+        city_name = data.get('cityName')
+        answers = data.get('answers', [])
+        question_ids = data.get('questionIds', [])
+
+        if not city_name or not answers or not question_ids:
+            return jsonify({'error': '缺少必要字段'}), 400
+
+        # 获取题目文件中的正确答案
+        city_mapping = {
+            '福州市': 'fuzhou',
+            '泉州市': 'quanzhou',
+            '南平市': 'nanping',
+            '龙岩市': 'longyan',
+            '莆田市': 'putian',
+            # 新增文化名称映射
+            '福州候官文化': 'fuzhou',
+            '泉州海丝文化': 'quanzhou',
+            '南平朱子文化': 'nanping',
+            '龙岩红色文化': 'longyan',
+            '莆田妈祖文化': 'putian'
+        }
+
+        city_key = city_mapping.get(city_name, city_name)
+        question_file = os.path.join(os.path.dirname(__file__), '..', 'frontend', f'{city_key}-question.txt')
+
+        if not os.path.exists(question_file):
+            return jsonify({'error': '题目文件不存在'}), 404
+
+        # 解析题目文件获取正确答案
+        correct_answers = []
+        with open(question_file, 'r', encoding='utf-8') as f:
+            content = f.read()
+
+        question_blocks = content.strip().split('\n\n')
+        for block in question_blocks:
+            if not block.strip():
+                continue
+
+            lines = block.strip().split('\n')
+            for line in lines:
+                if line.startswith('答案：'):
+                    correct_answers.append(line.replace('答案：', '').strip())
+                    break
+
+        # 计算得分
+        score = 0
+        total = len(answers)
+
+        for i, answer in enumerate(answers):
+            if answer and i < len(correct_answers):
+                if answer == correct_answers[i]:
+                    score += 1
+
+        # 如果得分达到60分，解锁城市探索权限
+        if (score / total) * 100 >= 60:
+            exploration = UserCityExploration.query.filter_by(
+                user_id=user_id,
+                city_name=city_name
+            ).first()
+
+            if not exploration:
+                exploration = UserCityExploration(
+                    user_id=user_id,
+                    city_name=city_name,
+                    is_explored=False
+                )
+                db.session.add(exploration)
+
+            if not exploration.is_explored:
+                exploration.is_explored = True
+                exploration.explored_at = datetime.utcnow()
+                db.session.commit()
+
+        return jsonify({
+            'score': score,
+            'total': total,
+            'percentage': round((score / total) * 100, 1),
+            'passed': (score / total) * 100 >= 60
+        }), 200
+
+    except Exception as e:
+        print(f"提交答题失败: {str(e)}")
+        return jsonify({'error': '提交失败'}), 500
 
 # 静态文件路由
 @app.route('/static/<path:filename>')

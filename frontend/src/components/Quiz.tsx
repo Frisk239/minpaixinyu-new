@@ -15,6 +15,14 @@ interface Question {
   correct_answer: string;
 }
 
+interface QuizResult {
+  questionId: number;
+  userAnswer: string;
+  correctAnswer: string;
+  isCorrect: boolean;
+  questionText: string;
+}
+
 interface QuizProps {
   cityName: string;
   onComplete: (score: number, total: number) => void;
@@ -28,11 +36,11 @@ const Quiz: React.FC<QuizProps> = ({ cityName: propCityName, onComplete, onBack 
   // 将URL参数中的英文标识转换为中文城市名称
   const getCityNameFromParam = (param: string) => {
     const cityMapping: { [key: string]: string } = {
-      'fuzhou': '福州市',
-      'quanzhou': '泉州市',
-      'nanping': '南平市',
-      'longyan': '龙岩市',
-      'putian': '莆田市'
+      'fuzhou': '福州候官文化',
+      'quanzhou': '泉州海丝文化',
+      'nanping': '南平朱子文化',
+      'longyan': '龙岩红色文化',
+      'putian': '莆田妈祖文化'
     };
     return cityMapping[param] || param;
   };
@@ -44,8 +52,12 @@ const Quiz: React.FC<QuizProps> = ({ cityName: propCityName, onComplete, onBack 
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState<string>('');
   const [answers, setAnswers] = useState<string[]>([]);
-  const [showResult, setShowResult] = useState(false);
+  const [quizResults, setQuizResults] = useState<QuizResult[]>([]);
+  const [showFeedback, setShowFeedback] = useState(false);
+  const [feedbackMessage, setFeedbackMessage] = useState('');
+  const [isCorrect, setIsCorrect] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [verifying, setVerifying] = useState(false);
   const [error, setError] = useState<string>('');
 
   // 获取题目数据
@@ -58,31 +70,108 @@ const Quiz: React.FC<QuizProps> = ({ cityName: propCityName, onComplete, onBack 
   const fetchQuestions = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`/api/questions/${currentCityName}`);
+      // 使用完整的API URL
+      const apiUrl = process.env.NODE_ENV === 'development'
+        ? `http://localhost:5000/api/questions/${currentCityName}`
+        : `https://frp-say.com:39668/api/questions/${currentCityName}`;
+
+      const response = await fetch(apiUrl);
       if (!response.ok) {
-        throw new Error('获取题目失败');
+        throw new Error(`获取题目失败: ${response.status} ${response.statusText}`);
       }
       const data = await response.json();
-      setQuestions(data.questions || []);
-      setAnswers(new Array(data.questions?.length || 0).fill(''));
+      const allQuestions = data.questions || [];
+
+      // 从所有题目中随机选择5道
+      const shuffled = [...allQuestions].sort(() => 0.5 - Math.random());
+      const selectedQuestions = shuffled.slice(0, 5);
+
+      setQuestions(selectedQuestions);
+      setAnswers(new Array(selectedQuestions.length).fill(''));
+      setQuizResults(new Array(selectedQuestions.length).fill(null));
     } catch (err) {
+      console.error('获取题目错误:', err);
       setError(err instanceof Error ? err.message : '获取题目失败');
     } finally {
       setLoading(false);
     }
   };
 
-  const handleAnswerSelect = (answer: string) => {
-    setSelectedAnswer(answer);
-    const newAnswers = [...answers];
-    newAnswers[currentQuestionIndex] = answer;
-    setAnswers(newAnswers);
+  // 验证答案
+  const verifyAnswer = async (answer: string) => {
+    if (!questions[currentQuestionIndex]) return;
+
+    try {
+      setVerifying(true);
+      const apiUrl = process.env.NODE_ENV === 'development'
+        ? `http://localhost:5000/api/questions/${currentCityName}/${questions[currentQuestionIndex].id}/verify`
+        : `https://frp-say.com:39668/api/questions/${currentCityName}/${questions[currentQuestionIndex].id}/verify`;
+
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({ answer })
+      });
+
+      if (!response.ok) {
+        throw new Error(`验证失败: ${response.status} ${response.statusText}`);
+      }
+
+      const result = await response.json();
+      const correct = result.is_correct;
+
+      // 更新答案数组
+      const newAnswers = [...answers];
+      newAnswers[currentQuestionIndex] = answer;
+      setAnswers(newAnswers);
+
+      // 更新结果数组
+      const newResults = [...quizResults];
+      newResults[currentQuestionIndex] = {
+        questionId: questions[currentQuestionIndex].id,
+        userAnswer: answer,
+        correctAnswer: result.correct_answer,
+        isCorrect: correct,
+        questionText: questions[currentQuestionIndex].question_text
+      };
+      setQuizResults(newResults);
+
+      // 显示反馈
+      setIsCorrect(correct);
+      setFeedbackMessage(correct ? '✓ 回答正确！' : `✗ 回答错误，正确答案是：${result.correct_answer}`);
+      setShowFeedback(true);
+
+      // 2秒后自动隐藏反馈并进入下一题
+      setTimeout(() => {
+        setShowFeedback(false);
+        handleNextQuestion();
+      }, 2000);
+
+    } catch (err) {
+      console.error('验证答案错误:', err);
+      setError(err instanceof Error ? err.message : '验证答案失败');
+    } finally {
+      setVerifying(false);
+    }
   };
 
-  const handleNext = () => {
+  const handleAnswerSelect = (answer: string) => {
+    if (verifying || showFeedback) return; // 防止重复点击
+
+    setSelectedAnswer(answer);
+    verifyAnswer(answer);
+  };
+
+  const handleNextQuestion = () => {
     if (currentQuestionIndex < questions.length - 1) {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
       setSelectedAnswer(answers[currentQuestionIndex + 1] || '');
+    } else {
+      // 所有题目答完，保存结果并跳转
+      finishQuiz();
     }
   };
 
@@ -93,35 +182,26 @@ const Quiz: React.FC<QuizProps> = ({ cityName: propCityName, onComplete, onBack 
     }
   };
 
-  const handleSubmit = async () => {
-    try {
-      const response = await fetch('/api/quiz/submit', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          cityName: currentCityName,
-          answers,
-          questionIds: questions.map(q => q.id)
-        })
-      });
+  const finishQuiz = () => {
+    // 计算最终得分
+    const correctCount = quizResults.filter(result => result?.isCorrect).length;
+    const totalQuestions = questions.length;
 
-      if (!response.ok) {
-        throw new Error('提交答案失败');
-      }
+    // 保存到localStorage
+    const quizData = {
+      cityName: currentCityName,
+      questions: questions,
+      results: quizResults,
+      score: correctCount,
+      total: totalQuestions,
+      percentage: totalQuestions > 0 ? Math.round((correctCount / totalQuestions) * 100) : 0,
+      completedAt: new Date().toISOString()
+    };
 
-      const result = await response.json();
-      setShowResult(true);
+    localStorage.setItem('quizResult', JSON.stringify(quizData));
 
-      // 导航到结果页面
-      setTimeout(() => {
-        navigate(`/quiz-result/${currentCityName}`);
-      }, 2000);
-
-    } catch (err) {
-      setError(err instanceof Error ? err.message : '提交答案失败');
-    }
+    // 导航到结果页面
+    navigate(`/quiz-result/${paramCityName}`);
   };
 
   const calculateProgress = () => {
@@ -173,6 +253,15 @@ const Quiz: React.FC<QuizProps> = ({ cityName: propCityName, onComplete, onBack 
 
   return (
     <div className="quiz-container">
+      {/* 背景图片 */}
+      <div className="quiz-background">
+        <img
+          src="http://localhost:5000/static/image/index.png"
+          alt="背景图片"
+          className="quiz-background-img"
+        />
+      </div>
+
       {/* 头部信息 */}
       <div className="quiz-header">
         <button onClick={onBack} className="back-btn">← 返回</button>
@@ -211,12 +300,12 @@ const Quiz: React.FC<QuizProps> = ({ cityName: propCityName, onComplete, onBack 
               className={`option-btn ${
                 selectedAnswer === key ? 'selected' : ''
               } ${
-                showResult && key === currentQuestion.correct_answer ? 'correct' : ''
+                showFeedback && key === currentQuestion.correct_answer ? 'correct' : ''
               } ${
-                showResult && selectedAnswer === key && key !== currentQuestion.correct_answer ? 'incorrect' : ''
+                showFeedback && selectedAnswer === key && key !== currentQuestion.correct_answer ? 'incorrect' : ''
               }`}
               onClick={() => handleAnswerSelect(key)}
-              disabled={showResult}
+              disabled={verifying || showFeedback}
             >
               <span className="option-key">{key}.</span>
               <span className="option-text">{value}</span>
@@ -224,11 +313,23 @@ const Quiz: React.FC<QuizProps> = ({ cityName: propCityName, onComplete, onBack 
           ))}
         </div>
 
-        {/* 答案解析（提交后显示） */}
-        {showResult && (
-          <div className="answer-explanation">
-            <h4>正确答案：{currentQuestion.correct_answer}</h4>
-            <p>你的选择：{selectedAnswer || '未选择'}</p>
+        {/* 即时反馈 */}
+        {showFeedback && (
+          <div className={`feedback-message ${isCorrect ? 'correct' : 'incorrect'}`}>
+            <div className="feedback-icon">
+              {isCorrect ? '✅' : '❌'}
+            </div>
+            <div className="feedback-text">
+              {feedbackMessage}
+            </div>
+          </div>
+        )}
+
+        {/* 加载状态 */}
+        {verifying && (
+          <div className="verifying">
+            <div className="spinner small"></div>
+            <p>正在验证答案...</p>
           </div>
         )}
       </div>
@@ -237,7 +338,7 @@ const Quiz: React.FC<QuizProps> = ({ cityName: propCityName, onComplete, onBack 
       <div className="quiz-navigation">
         <button
           onClick={handlePrevious}
-          disabled={currentQuestionIndex === 0}
+          disabled={currentQuestionIndex === 0 || verifying || showFeedback}
           className="nav-btn"
         >
           上一题
@@ -245,49 +346,48 @@ const Quiz: React.FC<QuizProps> = ({ cityName: propCityName, onComplete, onBack 
 
         {!isLastQuestion ? (
           <button
-            onClick={handleNext}
+            onClick={handleNextQuestion}
+            disabled={!isAnswered || verifying || showFeedback}
             className="nav-btn primary"
           >
             下一题
           </button>
         ) : (
           <button
-            onClick={handleSubmit}
-            disabled={getAnsweredCount() === 0}
+            onClick={finishQuiz}
+            disabled={getAnsweredCount() < questions.length || verifying || showFeedback}
             className="nav-btn primary submit-btn"
           >
-            提交答案
+            查看结果
           </button>
         )}
       </div>
 
       {/* 题目导航点 */}
       <div className="question-nav">
-        {questions.map((_, index) => (
-          <button
-            key={index}
-            className={`question-dot ${
-              index === currentQuestionIndex ? 'current' : ''
-            } ${
-              answers[index] !== '' ? 'answered' : ''
-            }`}
-            onClick={() => {
-              setCurrentQuestionIndex(index);
-              setSelectedAnswer(answers[index] || '');
-            }}
-          >
-            {index + 1}
-          </button>
-        ))}
+        {questions.map((_, index) => {
+          const result = quizResults[index];
+          return (
+            <button
+              key={index}
+              className={`question-dot ${
+                index === currentQuestionIndex ? 'current' : ''
+              } ${
+                result ? (result.isCorrect ? 'correct' : 'incorrect') : ''
+              }`}
+              onClick={() => {
+                if (!verifying && !showFeedback) {
+                  setCurrentQuestionIndex(index);
+                  setSelectedAnswer(answers[index] || '');
+                }
+              }}
+              disabled={verifying || showFeedback}
+            >
+              {index + 1}
+            </button>
+          );
+        })}
       </div>
-
-      {/* 结果显示 */}
-      {showResult && (
-        <div className="quiz-result">
-          <h3>答题完成！</h3>
-          <p>正在计算成绩...</p>
-        </div>
-      )}
     </div>
   );
 };

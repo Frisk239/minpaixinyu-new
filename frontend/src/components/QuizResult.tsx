@@ -1,6 +1,16 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import '../styles/QuizResult.css';
+
+interface QuizResultData {
+  cityName: string;
+  questions: any[];
+  results: any[];
+  score: number;
+  total: number;
+  percentage: number;
+  completedAt: string;
+}
 
 interface QuizResultProps {
   cityName: string;
@@ -27,21 +37,59 @@ const QuizResult: React.FC<QuizResultProps> = ({
 }) => {
   const { cityName: paramCityName } = useParams<{ cityName: string }>();
   const navigate = useNavigate();
+  const [quizData, setQuizData] = useState<QuizResultData | null>(null);
+  const [loading, setLoading] = useState(true);
 
   // 将URL参数中的英文标识转换为中文城市名称
   const getCityNameFromParam = (param: string) => {
     const cityMapping: { [key: string]: string } = {
-      'fuzhou': '福州市',
-      'quanzhou': '泉州市',
-      'nanping': '南平市',
-      'longyan': '龙岩市',
-      'putian': '莆田市'
+      'fuzhou': '福州候官文化',
+      'quanzhou': '泉州海丝文化',
+      'nanping': '南平朱子文化',
+      'longyan': '龙岩红色文化',
+      'putian': '莆田妈祖文化'
     };
     return cityMapping[param] || param;
   };
 
-  // 使用props中的cityName或URL参数中的cityName
-  const currentCityName = propCityName || (paramCityName ? getCityNameFromParam(paramCityName) : '');
+  // 从localStorage加载数据
+  useEffect(() => {
+    const loadQuizResult = () => {
+      try {
+        const storedData = localStorage.getItem('quizResult');
+        if (storedData) {
+          const parsedData = JSON.parse(storedData);
+          setQuizData(parsedData);
+        } else {
+          // 如果没有存储的数据，使用默认值
+          setQuizData({
+            cityName: propCityName || (paramCityName ? getCityNameFromParam(paramCityName) : ''),
+            questions: [],
+            results: [],
+            score: score || 0,
+            total: total || 0,
+            percentage: total > 0 ? Math.round((score / total) * 100) : 0,
+            completedAt: new Date().toISOString()
+          });
+        }
+      } catch (error) {
+        console.error('加载答题结果失败:', error);
+        setQuizData({
+          cityName: propCityName || (paramCityName ? getCityNameFromParam(paramCityName) : ''),
+          questions: [],
+          results: [],
+          score: 0,
+          total: 0,
+          percentage: 0,
+          completedAt: new Date().toISOString()
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadQuizResult();
+  }, [paramCityName, propCityName, score, total]);
 
   const handleRetry = () => {
     navigate(`/quiz/${paramCityName}`);
@@ -52,10 +100,33 @@ const QuizResult: React.FC<QuizResultProps> = ({
   };
 
   const handleViewStats = () => {
-    navigate('/home'); // 可以导航到统计页面
+    navigate('/home');
   };
-  const percentage = Math.round((score / total) * 100);
-  const isPassed = percentage >= 60;
+
+  if (loading) {
+    return (
+      <div className="quiz-result-container">
+        <div className="loading">
+          <div className="spinner"></div>
+          <p>正在加载结果...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!quizData) {
+    return (
+      <div className="quiz-result-container">
+        <div className="error">
+          <h3>加载失败</h3>
+          <p>无法加载答题结果</p>
+          <button onClick={handleBack} className="back-btn">返回</button>
+        </div>
+      </div>
+    );
+  }
+
+  const { cityName, score: finalScore, total: totalQuestions, percentage } = quizData;
 
   const getGradeText = () => {
     if (percentage >= 90) return '优秀';
@@ -73,140 +144,91 @@ const QuizResult: React.FC<QuizResultProps> = ({
     return '#f44336';
   };
 
-  const getEncouragementText = () => {
-    if (percentage >= 90) return '太棒了！你对这个城市的了解非常深入！';
-    if (percentage >= 80) return '很好！你对这个城市有很好的了解！';
-    if (percentage >= 70) return '不错！继续努力，你会了解得更多！';
-    if (percentage >= 60) return '及格了！多多探索这个城市吧！';
-    return '继续加油！多了解这个城市的历史文化！';
-  };
-
   return (
     <div className="quiz-result-container">
-      {/* 头部区域 */}
-      <div className="result-header">
-        <button onClick={onBack} className="back-btn">← 返回</button>
-        <h1>{currentCityName}知识问答</h1>
-        <div className="result-badge">
-          <span className="grade-text" style={{ color: getGradeColor() }}>
-            {getGradeText()}
-          </span>
-        </div>
+      {/* 背景图片 */}
+      <div className="quiz-background">
+        <img
+          src="http://localhost:5000/static/image/index.png"
+          alt="背景图片"
+          className="quiz-background-img"
+        />
       </div>
 
-      {/* 成绩概览 */}
-      <div className="score-overview">
-        <div className="score-circle">
-          <div className="score-number">{percentage}</div>
-          <div className="score-unit">%</div>
-        </div>
-        <div className="score-details">
-          <h3>答题成绩</h3>
-          <p className="score-text">
-            {score} / {total} 题正确
-          </p>
-          <p className="encouragement">
-            {getEncouragementText()}
-          </p>
-        </div>
-      </div>
-
-      {/* 详细分析 */}
-      <div className="result-analysis">
-        <h3>详细分析</h3>
-
-        <div className="stats-grid">
-          <div className="stat-item">
-            <div className="stat-icon">✅</div>
-            <div className="stat-content">
-              <div className="stat-number">{score}</div>
-              <div className="stat-label">正确答案</div>
-            </div>
-          </div>
-
-          <div className="stat-item">
-            <div className="stat-icon">❌</div>
-            <div className="stat-content">
-              <div className="stat-number">{total - score}</div>
-              <div className="stat-label">错误答案</div>
-            </div>
-          </div>
-
-          <div className="stat-item">
-            <div className="stat-icon">📊</div>
-            <div className="stat-content">
-              <div className="stat-number">{percentage}%</div>
-              <div className="stat-label">正确率</div>
-            </div>
-          </div>
-
-          <div className="stat-item">
-            <div className="stat-icon">⏱️</div>
-            <div className="stat-content">
-              <div className="stat-number">{total}</div>
-              <div className="stat-label">总题目数</div>
-            </div>
+      {/* 内容容器 */}
+      <div className="quiz-result-content">
+        {/* 头部区域 */}
+        <div className="result-header">
+          <button onClick={onBack} className="back-btn">← 返回</button>
+          <h1>{cityName}知识问答</h1>
+          <div className="result-badge">
+            <span className="grade-text" style={{ color: getGradeColor() }}>
+              {getGradeText()}
+            </span>
           </div>
         </div>
-      </div>
 
-      {/* 题目回顾 */}
-      <div className="question-review">
-        <h3>题目回顾</h3>
-        <div className="review-list">
-          {answers.map((answer, index) => {
-            const isCorrect = answer === correctAnswers[index];
-            return (
-              <div key={index} className={`review-item ${isCorrect ? 'correct' : 'incorrect'}`}>
-                <div className="question-number">第 {index + 1} 题</div>
-                <div className="answer-status">
-                  {isCorrect ? (
-                    <span className="status-correct">✓ 正确</span>
-                  ) : (
-                    <span className="status-incorrect">✗ 错误</span>
-                  )}
-                </div>
-                <div className="answer-detail">
-                  你的答案：{answer || '未作答'} | 正确答案：{correctAnswers[index]}
-                </div>
+        {/* 成绩概览 */}
+        <div className="score-overview">
+          <div className="score-circle">
+            <div className="score-number">{percentage}</div>
+            <div className="score-unit">%</div>
+          </div>
+          <div className="score-details">
+            <h3>答题成绩</h3>
+            <p className="score-text">
+              {finalScore} / {totalQuestions} 题正确
+            </p>
+          </div>
+        </div>
+
+        {/* 详细分析 */}
+        <div className="result-analysis">
+          <h3>详细分析</h3>
+
+          <div className="stats-grid">
+            <div className="stat-item">
+              <div className="stat-icon">✅</div>
+              <div className="stat-content">
+                <div className="stat-number">{finalScore}</div>
+                <div className="stat-label">答对</div>
               </div>
-            );
-          })}
+            </div>
+
+            <div className="stat-item">
+              <div className="stat-icon">❌</div>
+              <div className="stat-content">
+                <div className="stat-number">{totalQuestions - finalScore}</div>
+                <div className="stat-label">答错</div>
+              </div>
+            </div>
+
+            <div className="stat-item">
+              <div className="stat-icon">📊</div>
+              <div className="stat-content">
+                <div className="stat-number">{percentage}%</div>
+                <div className="stat-label">正确率</div>
+              </div>
+            </div>
+
+            <div className="stat-item">
+              <div className="stat-icon">⏱️</div>
+              <div className="stat-content">
+                <div className="stat-number">{totalQuestions}</div>
+                <div className="stat-label">总题数</div>
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
 
-      {/* 成就徽章 */}
-      {isPassed && (
-        <div className="achievement">
-          <div className="achievement-icon">🏆</div>
-          <h4>恭喜通关！</h4>
-          <p>你已经成功解锁了{currentCityName}的探索权限！</p>
-        </div>
-      )}
-
-      {/* 操作按钮 */}
-      <div className="result-actions">
-        <button onClick={onRetry} className="action-btn retry-btn">
-          🔄 重新答题
-        </button>
-        <button onClick={onViewStats} className="action-btn stats-btn">
-          📊 查看统计
-        </button>
-        <button onClick={onBack} className="action-btn back-btn">
-          🏠 返回首页
-        </button>
-      </div>
-
-      {/* 鼓励语 */}
-      <div className="encouragement-section">
-        <div className="encouragement-icon">💡</div>
-        <div className="encouragement-text">
-          <h4>学习建议</h4>
-          <p>
-            {percentage >= 80
-              ? "你对这个城市的了解已经很全面了！可以尝试探索其他城市，或者深入了解这个城市的更多细节。"
-              : "建议你多多探索这个城市的文化景点和历史遗迹，这样可以帮助你更好地理解相关知识。"}
-          </p>
+        {/* 操作按钮 */}
+        <div className="result-actions">
+          <button onClick={onRetry} className="action-btn">
+            🔄 重新答题
+          </button>
+          <button onClick={handleBack} className="action-btn">
+            🎯 回到互动答题页面
+          </button>
         </div>
       </div>
     </div>
