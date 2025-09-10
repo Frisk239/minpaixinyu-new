@@ -12,15 +12,42 @@ interface CityExploration {
   created_at: string;
 }
 
+interface CultureLink {
+  title: string;
+  url: string;
+  source: string;
+  fileName: string;
+}
+
+interface ExpertFile {
+  name: string;
+  path: string;
+}
+
+type ActiveTab = 'map' | 'overview' | 'experts' | 'youth';
+
 const City: React.FC = () => {
   const { cityName } = useParams<{ cityName: string }>();
   const navigate = useNavigate();
   const [cityExploration, setCityExploration] = useState<CityExploration | null>(null);
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState(false);
+  const [activeTab, setActiveTab] = useState<ActiveTab>('map');
+  const [cultureLinks, setCultureLinks] = useState<CultureLink[]>([]);
+  const [expertFiles, setExpertFiles] = useState<ExpertFile[]>([]);
+  const [contentLoading, setContentLoading] = useState(false);
 
   // 特殊城市列表
   const specialCities = ['福州市', '泉州市', '莆田市', '南平市', '龙岩市'];
+
+  // 城市名称映射
+  const cityMapping: { [key: string]: string } = {
+    '福州市': 'fuzhou',
+    '泉州市': 'quanzhou',
+    '南平市': 'nanping',
+    '龙岩市': 'longyan',
+    '莆田市': 'putian'
+  };
 
   useEffect(() => {
     if (!cityName || !specialCities.includes(decodeURIComponent(cityName))) {
@@ -89,6 +116,102 @@ const City: React.FC = () => {
     navigate('/home');
   };
 
+  // 切换标签页
+  const handleTabChange = async (tab: ActiveTab) => {
+    setActiveTab(tab);
+    setContentLoading(true);
+
+    try {
+      if (tab === 'overview') {
+        await loadCultureOverview();
+      } else if (tab === 'experts') {
+        await loadExpertFiles();
+      }
+    } catch (error) {
+      console.error('加载内容失败:', error);
+    } finally {
+      setContentLoading(false);
+    }
+  };
+
+  // 加载文化概览
+  const loadCultureOverview = async () => {
+    try {
+      const decodedCityName = decodeURIComponent(cityName!);
+      const cityKey = cityMapping[decodedCityName];
+
+      // 获取culture-introduction文件夹中的所有txt文件
+      const response = await axios.get(`http://localhost:5000/api/city/${cityKey}/culture-files`);
+      const files = response.data.files;
+
+      const allLinks: CultureLink[] = [];
+
+      // 解析每个txt文件
+      for (const file of files) {
+        try {
+          const fileResponse = await axios.get(`http://localhost:5000/api/city/${cityKey}/culture-file/${file}`);
+          const content = fileResponse.data.content;
+          const links = parseCultureLinks(content, file);
+          allLinks.push(...links);
+        } catch (error) {
+          console.error(`解析文件 ${file} 失败:`, error);
+        }
+      }
+
+      setCultureLinks(allLinks);
+    } catch (error) {
+      console.error('加载文化概览失败:', error);
+      setCultureLinks([]);
+    }
+  };
+
+  // 加载专家文件
+  const loadExpertFiles = async () => {
+    try {
+      const decodedCityName = decodeURIComponent(cityName!);
+      const cityKey = cityMapping[decodedCityName];
+
+      const response = await axios.get(`http://localhost:5000/api/city/${cityKey}/expert-files`);
+      setExpertFiles(response.data.files);
+    } catch (error) {
+      console.error('加载专家文件失败:', error);
+      setExpertFiles([]);
+    }
+  };
+
+  // 解析文化链接
+  const parseCultureLinks = (content: string, fileName: string): CultureLink[] => {
+    const links: CultureLink[] = [];
+    const lines = content.split('\n').filter(line => line.trim());
+
+    for (let i = 0; i < lines.length; i += 2) {
+      const titleLine = lines[i];
+      const sourceLine = lines[i + 1];
+
+      if (titleLine && sourceLine) {
+        // 解析标题和URL
+        const titleMatch = titleLine.match(/《(.+)》(.+)/);
+        const sourceMatch = sourceLine.match(/来源：(.+)/);
+
+        if (titleMatch && sourceMatch) {
+          links.push({
+            title: titleMatch[1],
+            url: titleMatch[2].trim(),
+            source: sourceMatch[1],
+            fileName: fileName
+          });
+        }
+      }
+    }
+
+    return links;
+  };
+
+  // 打开外部链接
+  const openExternalLink = (url: string) => {
+    window.open(url, '_blank', 'noopener,noreferrer');
+  };
+
   if (loading) {
     return (
       <div className="city-loading">
@@ -102,7 +225,7 @@ const City: React.FC = () => {
     return (
       <div className="city-error">
         <h2>城市信息加载失败</h2>
-        <button onClick={goBackToHome} className="back-btn">
+        <button onClick={goBackToHome} className="city-back-btn">
           返回文化云游
         </button>
       </div>
@@ -110,60 +233,186 @@ const City: React.FC = () => {
   }
 
   const decodedCityName = decodeURIComponent(cityName!);
+  const cityKey = cityMapping[decodedCityName];
 
   return (
-    <div className="city-container">
-      <div className="city-header">
-        <h1>{decodedCityName}</h1>
-        <div className="city-status">
-          <span className={`status-badge ${cityExploration.is_explored ? 'explored' : 'unexplored'}`}>
-            {cityExploration.is_explored ? '已探索' : '未探索'}
-          </span>
-        </div>
+    <div className="city-detail-container">
+      {/* 背景图片 */}
+      <div className="city-background">
+        <img
+          src="http://localhost:5000/static/image/index.png"
+          alt="背景图片"
+          className="city-background-img"
+        />
       </div>
 
-      <div className="city-content">
-        <div className="city-info">
-          <h2>城市介绍</h2>
-          <p>这里是 {decodedCityName} 的介绍页面。</p>
-          <p>您可以在这里探索城市的文化特色和历史故事。</p>
-
-          {cityExploration.is_explored && (
-            <div className="explored-info">
-              <h3>探索完成时间</h3>
-              <p>{new Date(cityExploration.explored_at!).toLocaleString('zh-CN')}</p>
+      {/* 主要内容 */}
+      <div className="city-detail-content">
+        {/* 左侧边栏 */}
+        <div className="city-sidebar">
+          <div className="sidebar-header">
+            <h2>{decodedCityName}</h2>
+            <div className="city-status">
+              <span className={`status-badge ${cityExploration.is_explored ? 'explored' : 'unexplored'}`}>
+                {cityExploration.is_explored ? '已探索' : '未探索'}
+              </span>
             </div>
-          )}
-        </div>
-
-        <div className="city-actions">
-          {/* 调试信息 */}
-          <div style={{ marginBottom: '10px', fontSize: '12px', color: '#666' }}>
-            调试信息: is_explored = {cityExploration.is_explored ? 'true' : 'false'}
           </div>
 
-          {!cityExploration.is_explored && (
+          <div className="sidebar-nav">
             <button
-              onClick={markAsExplored}
-              disabled={updating}
-              className="explore-btn"
+              className={`nav-btn ${activeTab === 'map' ? 'active' : ''}`}
+              onClick={() => handleTabChange('map')}
             >
-              {updating ? '标记中...' : '标记为已探索'}
+              文化地点分布
             </button>
-          )}
+            <button
+              className={`nav-btn ${activeTab === 'overview' ? 'active' : ''}`}
+              onClick={() => handleTabChange('overview')}
+            >
+              文化概览
+            </button>
+            <button
+              className={`nav-btn ${activeTab === 'experts' ? 'active' : ''}`}
+              onClick={() => handleTabChange('experts')}
+            >
+              专家有话说
+            </button>
+            <button
+              className={`nav-btn ${activeTab === 'youth' ? 'active' : ''}`}
+              onClick={() => handleTabChange('youth')}
+            >
+              青年有话说
+            </button>
+          </div>
 
-          {cityExploration.is_explored && (
-            <div style={{ marginBottom: '10px', fontSize: '14px', color: '#28a745' }}>
-              ✅ 此城市已探索完成！
+          <div className="sidebar-actions">
+            <div className="action-buttons-row">
+              {!cityExploration.is_explored && (
+                <button
+                  onClick={markAsExplored}
+                  disabled={updating}
+                  className="explore-btn"
+                >
+                  {updating ? '标记中...' : '标记为已探索'}
+                </button>
+              )}
+
+              <button
+                onClick={goBackToHome}
+                className="city-back-btn"
+              >
+                返回文化云游
+              </button>
+            </div>
+
+            {cityExploration.is_explored && (
+              <div className="explored-status">
+                <div className="explored-badge">
+                  <span className="checkmark">✓</span>
+                  <span>已探索完成</span>
+                </div>
+                <div className="explored-time">
+                  {new Date(cityExploration.explored_at!).toLocaleString('zh-CN')}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* 右侧内容区域 */}
+        <div className="city-content-area">
+          {contentLoading && (
+            <div className="content-loading">
+              <div className="loading-spinner"></div>
+              <p>正在加载内容...</p>
             </div>
           )}
 
-          <button
-            onClick={goBackToHome}
-            className="back-btn"
-          >
-            返回文化云游
-          </button>
+          {/* 文化地点分布 */}
+          {activeTab === 'map' && !contentLoading && (
+            <div className="content-section">
+              <div className="city-image-container">
+                <img
+                  src={`http://localhost:5000/static/${cityKey}/${cityKey}.PNG`}
+                  alt={`${decodedCityName}文化地点分布`}
+                  className="city-image"
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    target.src = 'http://localhost:5000/static/image/index.png';
+                  }}
+                />
+              </div>
+            </div>
+          )}
+
+          {/* 文化概览 */}
+          {activeTab === 'overview' && !contentLoading && (
+            <div className="content-section">
+              <h3>文化概览</h3>
+              {cultureLinks.length > 0 ? (
+                <div className="culture-links">
+                  {cultureLinks.map((link, index) => (
+                    <div
+                      key={index}
+                      className="culture-link-item"
+                      onClick={() => openExternalLink(link.url)}
+                    >
+                      <div className="link-title">{link.title}</div>
+                      <div className="link-source">来源：{link.source}</div>
+                      <div className="link-file">来自：{link.fileName}</div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="no-content">
+                  <p>暂无文化概览内容</p>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* 专家有话说 */}
+          {activeTab === 'experts' && !contentLoading && (
+            <div className="content-section">
+              <h3>专家有话说</h3>
+              {expertFiles.length > 0 ? (
+                <div className="expert-files">
+                  {expertFiles.map((file, index) => (
+                    <div
+                      key={index}
+                      className="expert-file-item"
+                      onClick={() => {
+                        // TODO: 打开Word阅读器
+                        console.log('打开文件:', file.path);
+                      }}
+                    >
+                      <div className="file-icon">📄</div>
+                      <div className="file-name">{file.name}</div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="no-content">
+                  <p>暂无专家文件</p>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* 青年有话说 */}
+          {activeTab === 'youth' && !contentLoading && (
+            <div className="content-section">
+              <h3>青年有话说</h3>
+              <div className="word-viewer">
+                {/* TODO: 集成Word阅读器 */}
+                <div className="word-placeholder">
+                  <p>Word文档阅读器</p>
+                  <p>文件：{cityKey}/report.docx</p>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>

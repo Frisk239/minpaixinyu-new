@@ -617,6 +617,119 @@ def submit_quiz():
         print(f"提交答题失败: {str(e)}")
         return jsonify({'error': '提交失败'}), 500
 
+# 城市资源相关API
+@app.route('/api/city/<city_name>/culture-files', methods=['GET'])
+def get_culture_files(city_name):
+    """获取城市的文化概览文件列表"""
+    try:
+        # 城市名称映射
+        city_mapping = {
+            '福州市': 'fuzhou',
+            '泉州市': 'quanzhou',
+            '南平市': 'nanping',
+            '龙岩市': 'longyan',
+            '莆田市': 'putian',
+            # 新增文化名称映射
+            '福州候官文化': 'fuzhou',
+            '泉州海丝文化': 'quanzhou',
+            '南平朱子文化': 'nanping',
+            '龙岩红色文化': 'longyan',
+            '莆田妈祖文化': 'putian'
+        }
+
+        city_key = city_mapping.get(city_name, city_name)
+        culture_dir = os.path.join(os.path.dirname(__file__), '..', 'frontend', 'static', city_key, 'culture-introduction')
+
+        if not os.path.exists(culture_dir):
+            return jsonify({'files': []}), 200
+
+        # 获取所有txt文件
+        files = []
+        for file in os.listdir(culture_dir):
+            if file.endswith('.txt'):
+                files.append(file)
+
+        return jsonify({'files': files}), 200
+
+    except Exception as e:
+        print(f"获取文化文件列表失败: {str(e)}")
+        return jsonify({'error': '获取文件列表失败'}), 500
+
+@app.route('/api/city/<city_name>/culture-file/<filename>', methods=['GET'])
+def get_culture_file(city_name, filename):
+    """获取文化概览文件内容"""
+    try:
+        # 城市名称映射
+        city_mapping = {
+            '福州市': 'fuzhou',
+            '泉州市': 'quanzhou',
+            '南平市': 'nanping',
+            '龙岩市': 'longyan',
+            '莆田市': 'putian',
+            # 新增文化名称映射
+            '福州候官文化': 'fuzhou',
+            '泉州海丝文化': 'quanzhou',
+            '南平朱子文化': 'nanping',
+            '龙岩红色文化': 'longyan',
+            '莆田妈祖文化': 'putian'
+        }
+
+        city_key = city_mapping.get(city_name, city_name)
+        file_path = os.path.join(os.path.dirname(__file__), '..', 'frontend', 'static', city_key, 'culture-introduction', filename)
+
+        if not os.path.exists(file_path):
+            return jsonify({'error': '文件不存在'}), 404
+
+        with open(file_path, 'r', encoding='utf-8') as f:
+            content = f.read()
+
+        return jsonify({'content': content}), 200
+
+    except Exception as e:
+        print(f"获取文化文件内容失败: {str(e)}")
+        return jsonify({'error': '获取文件内容失败'}), 500
+
+@app.route('/api/city/<city_name>/expert-files', methods=['GET'])
+def get_expert_files(city_name):
+    """获取城市的专家文件列表"""
+    try:
+        # 城市名称映射
+        city_mapping = {
+            '福州市': 'fuzhou',
+            '泉州市': 'quanzhou',
+            '南平市': 'nanping',
+            '龙岩市': 'longyan',
+            '莆田市': 'putian',
+            # 新增文化名称映射
+            '福州候官文化': 'fuzhou',
+            '泉州海丝文化': 'quanzhou',
+            '南平朱子文化': 'nanping',
+            '龙岩红色文化': 'longyan',
+            '莆田妈祖文化': 'putian'
+        }
+
+        city_key = city_mapping.get(city_name, city_name)
+        expert_dir = os.path.join(os.path.dirname(__file__), '..', 'frontend', 'static', city_key, 'professor')
+
+        if not os.path.exists(expert_dir):
+            return jsonify({'files': []}), 200
+
+        # 获取所有docx文件
+        files = []
+        for file in os.listdir(expert_dir):
+            if file.endswith('.docx'):
+                file_path = f'/static/{city_key}/professor/{file}'
+                files.append({
+                    'name': file,
+                    'path': file_path
+                })
+
+        return jsonify({'files': files}), 200
+
+    except Exception as e:
+        print(f"获取专家文件列表失败: {str(e)}")
+        return jsonify({'error': '获取专家文件列表失败'}), 500
+
 # 静态文件路由
 @app.route('/static/<path:filename>')
 def static_files(filename):
