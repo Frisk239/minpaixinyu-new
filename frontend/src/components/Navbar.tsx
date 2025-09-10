@@ -19,7 +19,7 @@ const Navbar: React.FC<NavbarProps> = ({ onLogout }) => {
         {/* Logo */}
         <div className="navbar-logo">
           <img
-            src="http://localhost:5000/static/image/logo.png"
+            src="/static/image/logo.png"
             alt="民派新语"
             className="logo-img"
           />

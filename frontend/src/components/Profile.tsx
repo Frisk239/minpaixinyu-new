@@ -109,7 +109,7 @@ const Profile: React.FC<ProfileProps> = ({ user, onLogout }) => {
       {/* 背景图片 */}
       <div className="profile-background">
         <img
-          src="http://localhost:5000/static/image/index.png"
+          src="/static/image/index.png"
           alt="背景图片"
           className="profile-background-img"
         />

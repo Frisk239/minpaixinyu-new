@@ -55,7 +55,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
       {/* 上方图片 */}
       <div className="login-top-image">
         <img
-          src="http://localhost:5000/static/image/login1.png"
+          src="/static/image/login1.png"
           alt="登录页面顶部"
           className="login1-img"
         />
@@ -67,7 +67,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
           {/* Logo */}
           <div className="navbar-logo">
             <img
-              src="http://localhost:5000/static/image/logo.png"
+              src="/static/image/logo.png"
               alt="闽派新语"
               className="navbar-logo-img"
             />
@@ -95,7 +95,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
         {/* 左侧图片 */}
         <div className="login-left-image">
           <img
-            src="http://localhost:5000/static/image/login2.png"
+            src="/static/image/login2.png"
             alt="登录页面左侧"
             className="login2-img"
           />

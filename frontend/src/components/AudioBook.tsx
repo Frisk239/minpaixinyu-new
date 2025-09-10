@@ -14,7 +14,7 @@ const AudioBook: React.FC = () => {
       {/* 背景图片 */}
       <div className="audio-book-background">
         <img
-          src="http://localhost:5000/static/image/index.png"
+          src="/static/image/index.png"
           alt="有声读物背景"
           className="background-img"
         />
@@ -30,7 +30,7 @@ const AudioBook: React.FC = () => {
               onClick={() => handleImageClick(index)}
             >
               <img
-                src={`http://localhost:5000/static/image/passage${index}.png`}
+                src={`/static/image/passage${index}.png`}
                 alt={`有声读物 ${index}`}
                 className="passage-img"
                 onError={(e) => {

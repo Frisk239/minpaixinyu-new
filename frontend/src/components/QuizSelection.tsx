@@ -19,31 +19,31 @@ const QuizSelection: React.FC = () => {
     {
       name: '福州候官文化',
       description: '福州传统文化的重要载体，展现闽都文化的独特魅力',
-      image: 'http://localhost:5000/static/image/fuzhou.PNG',
+      image: '/static/image/fuzhou.PNG',
       questionCount: 5
     },
     {
       name: '泉州海丝文化',
       description: '古代海上丝绸之路的重要港口，多元文化交融之地',
-      image: 'http://localhost:5000/static/image/quanzhou.PNG',
+      image: '/static/image/quanzhou.PNG',
       questionCount: 5
     },
     {
       name: '南平朱子文化',
       description: '理学大师朱熹的故乡，儒家文化的重要传承地',
-      image: 'http://localhost:5000/static/image/nanping.PNG',
+      image: '/static/image/nanping.PNG',
       questionCount: 5
     },
     {
       name: '龙岩红色文化',
       description: '中国革命的重要策源地，红色文化的精神家园',
-      image: 'http://localhost:5000/static/image/longyan.PNG',
+      image: '/static/image/longyan.PNG',
       questionCount: 5
     },
     {
       name: '莆田妈祖文化',
       description: '妈祖文化的发源地，海洋文化的精神象征',
-      image: 'http://localhost:5000/static/image/putian.PNG',
+      image: '/static/image/putian.PNG',
       questionCount: 5
     }
   ];
@@ -90,7 +90,7 @@ const QuizSelection: React.FC = () => {
       {/* 背景图片 */}
       <div className="quiz-selection-background">
         <img
-          src="http://localhost:5000/static/image/index.png"
+          src="/static/image/index.png"
           alt="背景图片"
           className="quiz-selection-background-img"
         />
@@ -119,7 +119,7 @@ const QuizSelection: React.FC = () => {
                 className="city-image"
                 onError={(e) => {
                   const target = e.target as HTMLImageElement;
-                  target.src = 'http://localhost:5000/static/image/logo.png';
+                  target.src = '/static/image/logo.png';
                 }}
               />
               <div className="city-overlay">

@@ -231,9 +231,9 @@ const PDFReader: React.FC<PDFReaderProps> = () => {
       {/* 背景图片 */}
       <div className="pdf-reader-background">
         <img
-          src="http://localhost:5000/static/image/index.png"
+          src="/static/image/index.png"
           alt="PDF阅读器背景"
-          className="background-img"
+          className="pdf-background-img"
         />
       </div>
 
@@ -251,7 +251,7 @@ const PDFReader: React.FC<PDFReaderProps> = () => {
             <div className="pdf-page left-page">
               <PDFPage
                 pageNumber={leftPage}
-                pdfUrl="http://localhost:5000/static/text.pdf"
+                pdfUrl="/static/text.pdf"
               />
             </div>
 
@@ -260,7 +260,7 @@ const PDFReader: React.FC<PDFReaderProps> = () => {
               {!shouldShowBlankPage() ? (
                 <PDFPage
                   pageNumber={rightPage}
-                  pdfUrl="http://localhost:5000/static/text.pdf"
+                  pdfUrl="/static/text.pdf"
                 />
               ) : (
                 <div className="blank-page">

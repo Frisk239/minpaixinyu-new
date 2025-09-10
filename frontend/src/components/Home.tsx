@@ -20,9 +20,9 @@ const Home: React.FC<HomeProps> = ({ user }) => {
       {/* 背景图片 */}
       <div className="home-background">
         <img
-          src="http://localhost:5000/static/image/index.png"
+          src="/static/image/index.png"
           alt="首页背景"
-          className="background-img"
+          className="home-background-img"
         />
       </div>
 

@@ -71,9 +71,7 @@ const Quiz: React.FC<QuizProps> = ({ cityName: propCityName, onComplete, onBack 
     try {
       setLoading(true);
       // 使用完整的API URL
-      const apiUrl = process.env.NODE_ENV === 'development'
-        ? `http://localhost:5000/api/questions/${currentCityName}`
-        : `https://frp-say.com:39668/api/questions/${currentCityName}`;
+      const apiUrl = `/api/questions/${currentCityName}`;
 
       const response = await fetch(apiUrl);
       if (!response.ok) {
@@ -103,9 +101,7 @@ const Quiz: React.FC<QuizProps> = ({ cityName: propCityName, onComplete, onBack 
 
     try {
       setVerifying(true);
-      const apiUrl = process.env.NODE_ENV === 'development'
-        ? `http://localhost:5000/api/questions/${currentCityName}/${questions[currentQuestionIndex].id}/verify`
-        : `https://frp-say.com:39668/api/questions/${currentCityName}/${questions[currentQuestionIndex].id}/verify`;
+      const apiUrl = `/api/questions/${currentCityName}/${questions[currentQuestionIndex].id}/verify`;
 
       const response = await fetch(apiUrl, {
         method: 'POST',
@@ -256,7 +252,7 @@ const Quiz: React.FC<QuizProps> = ({ cityName: propCityName, onComplete, onBack 
       {/* 背景图片 */}
       <div className="quiz-background">
         <img
-          src="http://localhost:5000/static/image/index.png"
+          src="/static/image/index.png"
           alt="背景图片"
           className="quiz-background-img"
         />

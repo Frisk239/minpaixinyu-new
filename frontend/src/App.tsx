@@ -16,10 +16,8 @@ import Profile from './components/Profile';
 import Navbar from './components/Navbar';
 import './App.css';
 
-// API 配置 - 开发环境使用本地后端，生产环境使用公网地址
-const isDevelopment = process.env.NODE_ENV === 'development';
-const isProduction = process.env.NODE_ENV === 'production';
-axios.defaults.baseURL = isDevelopment ? 'http://localhost:5000' : (isProduction ? 'https://frp-say.com:39668' : '');
+// API 配置 - 使用代理配置，开发环境自动代理到后端
+axios.defaults.baseURL = '';
 axios.defaults.withCredentials = true; // 允许发送cookies
 
 // 响应拦截器 - 处理认证错误

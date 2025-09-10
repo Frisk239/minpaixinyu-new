@@ -149,9 +149,9 @@ const QuizResult: React.FC<QuizResultProps> = ({
       {/* 背景图片 */}
       <div className="quiz-background">
         <img
-          src="http://localhost:5000/static/image/index.png"
+          src="/static/image/index.png"
           alt="背景图片"
-          className="quiz-background-img"
+          className="quiz-result-background-img"
         />
       </div>
 

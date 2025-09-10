@@ -288,9 +288,12 @@
 .city-image-container {
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: flex-start;
   height: 100%;
   min-height: 500px;
+  max-height: calc(100vh - 150px);
+  padding: 10px;
+  overflow: hidden;
 }
 
 .city-image {
@@ -299,6 +302,12 @@
   border-radius: 15px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
   object-fit: contain;
+  object-position: top center;
+  transition: transform 0.3s ease;
+}
+
+.city-image:hover {
+  transform: scale(1.02);
 }
 
 /* 文化概览链接列表 */
@@ -401,32 +410,53 @@
   line-height: 1.3;
 }
 
-/* Word文档阅读器占位符 */
-.word-viewer {
+/* 青年有话说区域 */
+.youth-section {
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100%;
-  min-height: 400px;
+  min-height: 200px;
+}
+
+.youth-report-item {
   background: #f8f9fa;
   border-radius: 15px;
-  border: 2px dashed #DAA520;
-}
-
-.word-placeholder {
+  padding: 30px;
   text-align: center;
-  color: #666;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+  max-width: 300px;
+  width: 100%;
 }
 
-.word-placeholder p {
-  margin: 10px 0;
-  font-size: 1.1rem;
+.youth-report-item:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  border-color: #DAA520;
 }
 
-.word-placeholder p:first-child {
+.youth-report-item .file-icon {
+  font-size: 3rem;
+  margin-bottom: 15px;
+  display: block;
+  color: #667eea;
+}
+
+.youth-report-item .file-name {
   font-weight: 600;
   color: #2c3e50;
-  font-size: 1.3rem;
+  font-size: 1.1rem;
+  line-height: 1.4;
+  margin-bottom: 8px;
+}
+
+.youth-report-item .file-desc {
+  color: #666;
+  font-size: 0.9rem;
+  line-height: 1.4;
 }
 
 /* 无内容提示 */
@@ -663,6 +693,28 @@
 
   .word-viewer {
     min-height: 300px;
+  }
+
+  .youth-section {
+    min-height: 150px;
+  }
+
+  .youth-report-item {
+    padding: 20px;
+    max-width: 250px;
+  }
+
+  .youth-report-item .file-icon {
+    font-size: 2.5rem;
+    margin-bottom: 12px;
+  }
+
+  .youth-report-item .file-name {
+    font-size: 1rem;
+  }
+
+  .youth-report-item .file-desc {
+    font-size: 0.85rem;
   }
 }
 

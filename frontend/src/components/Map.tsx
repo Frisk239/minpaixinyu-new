@@ -33,7 +33,7 @@ const Map: React.FC<MapProps> = ({ userId }) => {
   useEffect(() => {
     const fetchCityExplorations = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/city-explorations');
+        const response = await axios.get('/api/city-explorations');
         setCityExplorations(response.data.explorations);
       } catch (error) {
         console.error('获取城市探索状态失败:', error);
@@ -54,7 +54,7 @@ const Map: React.FC<MapProps> = ({ userId }) => {
     const drawMap = async () => {
       try {
         // 获取福建地图数据
-        const response = await axios.get('http://localhost:5000/static/fujian.json');
+        const response = await axios.get('/static/fujian.json');
         const fujianData = response.data;
 
         // 设置SVG尺寸

@@ -64,7 +64,7 @@ Hello～ 我是你们的闽派文化小伙伴「闽仔」！🔥
     setIsLoading(true);
 
     try {
-      const response = await axios.post('http://localhost:5000/api/ai-chat', {
+      const response = await axios.post('/api/ai-chat', {
         message: messageToSend
       });
 
@@ -106,7 +106,7 @@ Hello～ 我是你们的闽派文化小伙伴「闽仔」！🔥
       {/* 背景图片 */}
       <div className="ai-background">
         <img
-          src="http://localhost:5000/static/image/index.png"
+          src="/static/image/index.png"
           alt="AI对话背景"
           className="ai-background-img"
         />
@@ -116,7 +116,7 @@ Hello～ 我是你们的闽派文化小伙伴「闽仔」！🔥
       <div className="ai-avatar-section">
         <div className="ai-avatar">
           <img
-            src="http://localhost:5000/static/image/cartoon_charactor.png"
+            src="/static/image/cartoon_charactor.png"
             alt="闽仔 - 闽派文化小伙伴"
             className="avatar-image"
             onError={(e) => {

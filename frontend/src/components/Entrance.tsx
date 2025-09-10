@@ -20,9 +20,9 @@ const Entrance: React.FC = () => {
     <div className="entrance-container" onClick={handleClick}>
       <div className="entrance-image fade-in">
         <img
-          src="http://localhost:5000/static/image/entrance.png"
+          src="/static/image/entrance.png"
           alt="进入页面"
-          className="entrance-img"
+          className="entrance-background-img"
         />
       </div>
 
