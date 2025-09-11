@@ -1,7 +1,8 @@
 /* 游戏设置页面样式 */
 .game-settings {
-  min-height: 100vh;
   position: relative;
+  min-height: 100vh;
+  overflow-x: hidden;
   font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif;
 }
 
@@ -13,22 +14,22 @@
   width: 100%;
   height: 100%;
   z-index: -1;
-  opacity: 0.1;
 }
 
 .settings-bg-image {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  filter: brightness(0.7);
 }
 
 /* 主要内容 */
 .settings-content {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 30px 20px;
   position: relative;
   z-index: 1;
+  padding: 80px 20px 40px; /* 为导航栏留出空间 */
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
 /* 头部 */
@@ -319,7 +320,7 @@
 /* 响应式设计 */
 @media (max-width: 768px) {
   .settings-content {
-    padding: 20px 15px;
+    padding: 70px 15px 30px; /* 移动端为导航栏留出空间 */
   }
 
   .settings-header {

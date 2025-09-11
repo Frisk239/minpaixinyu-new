@@ -247,10 +247,7 @@ const GameBoard: React.FC<GameBoardProps> = ({ difficulty = 'medium' }) => {
     setShowMessage(false);
   };
 
-  // 返回首页
-  const handleBack = () => {
-    navigate('/home');
-  };
+
 
   // 开始叫牌倒计时
   const startMinpaiCountdown = () => {
@@ -353,15 +350,7 @@ const GameBoard: React.FC<GameBoardProps> = ({ difficulty = 'medium' }) => {
           />
         </div>
 
-        {/* 游戏头部 */}
-        <div className="game-header">
-          <button onClick={handleBack} className="back-btn">← 返回首页</button>
-          <h1>🎴 《一起闽派！》</h1>
-          <div className="game-info">
-            <span>回合: {gameState.roundCount}</span>
-            <span>当前玩家: {gameState.currentPlayer === 'human' ? '你' : 'AI'}</span>
-          </div>
-        </div>
+        {/* 返回按钮移到游戏统计区域 */}
 
         {/* 游戏主体 */}
         <div className="game-main">
@@ -457,6 +446,14 @@ const GameBoard: React.FC<GameBoardProps> = ({ difficulty = 'medium' }) => {
 
         {/* 游戏统计 */}
         <div className="game-stats">
+          <div className="stat-item">
+            <span className="stat-label">回合:</span>
+            <span className="stat-value">{gameState.roundCount}</span>
+          </div>
+          <div className="stat-item">
+            <span className="stat-label">当前玩家:</span>
+            <span className="stat-value">{gameState.currentPlayer === 'human' ? '你' : 'AI'}</span>
+          </div>
           <div className="stat-item">
             <span className="stat-label">你的罚牌:</span>
             <span className="stat-value">{gameState.penalties.player}</span>
