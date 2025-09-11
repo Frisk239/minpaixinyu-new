@@ -313,70 +313,113 @@ export class GameEngine {
 
   // 应用罚牌
   private applyPenalty(player: 'human' | 'ai'): boolean {
-    console.log(`🃏 ${player === 'human' ? '玩家' : 'AI'}开始执行罚牌`);
+    const timestamp = Date.now();
+    console.log(`🃏 [${timestamp}] ${player === 'human' ? '玩家' : 'AI'}开始执行罚牌`);
+    console.log(`🔍 [${timestamp}] 当前牌堆大小: ${this.gameState.deck.length}`);
+    console.log(`🔍 [${timestamp}] 当前弃牌堆大小: ${this.gameHistory.length}`);
 
     const handBefore = player === 'human' ? this.gameState.playerHand.length : this.gameState.aiHand.length;
     let cardsAdded = 0;
     const penaltyCards: Card[] = [];
 
-    // 抽取两张牌
-    for (let i = 0; i < 2; i++) {
-      // 如果牌堆空了，需要洗牌
-      if (this.gameState.deck.length === 0) {
-        console.log('🃏 牌堆已空，尝试洗牌');
-        const shuffleSuccess = this.shuffleDiscardPile();
-        if (!shuffleSuccess) {
-          console.log('🃏 无法洗牌，停止罚牌');
+    try {
+      console.log(`⚡ [${timestamp}] 开始抽取两张牌...`);
+
+      // 抽取两张牌
+      for (let i = 0; i < 2; i++) {
+        console.log(`🔄 [${timestamp}] 第${i + 1}张牌 - 检查牌堆状态`);
+
+        // 如果牌堆空了，需要洗牌
+        if (this.gameState.deck.length === 0) {
+          console.log(`🃏 [${timestamp}] 牌堆已空，尝试洗牌`);
+          console.log(`📊 [${timestamp}] 弃牌堆有 ${this.gameHistory.length} 张牌`);
+
+          const shuffleSuccess = this.shuffleDiscardPile();
+          console.log(`🔄 [${timestamp}] 洗牌结果: ${shuffleSuccess ? '成功' : '失败'}`);
+
+          if (!shuffleSuccess) {
+            console.log(`❌ [${timestamp}] 无法洗牌，停止罚牌`);
+            break;
+          }
+
+          console.log(`📊 [${timestamp}] 洗牌后牌堆大小: ${this.gameState.deck.length}`);
+        }
+
+        // 如果还是没有牌，停止罚牌
+        if (this.gameState.deck.length === 0) {
+          console.log(`❌ [${timestamp}] 牌堆仍然为空，无法继续罚牌`);
           break;
         }
+
+        console.log(`🎯 [${timestamp}] 从牌堆抽取第${i + 1}张牌`);
+        const penaltyCard = this.gameState.deck[0];
+        this.gameState.deck = this.gameState.deck.slice(1);
+        penaltyCards.push(penaltyCard);
+
+        if (player === 'human') {
+          this.gameState.playerHand.push(penaltyCard);
+          console.log(`✅ [${timestamp}] 玩家获得罚牌: ${penaltyCard.name} (${penaltyCard.culture}, ${penaltyCard.type})`);
+        } else {
+          this.gameState.aiHand.push(penaltyCard);
+          console.log(`✅ [${timestamp}] AI获得罚牌: ${penaltyCard.name} (${penaltyCard.culture}, ${penaltyCard.type})`);
+        }
+
+        cardsAdded++;
+        console.log(`📊 [${timestamp}] 当前已添加 ${cardsAdded} 张牌`);
       }
 
-      // 如果还是没有牌，停止罚牌
-      if (this.gameState.deck.length === 0) {
-        console.log('🃏 牌堆仍然为空，无法继续罚牌');
-        break;
+      const handAfter = player === 'human' ? this.gameState.playerHand.length : this.gameState.aiHand.length;
+      console.log(`📊 [${timestamp}] 罚牌结果统计: ${handBefore} → ${handAfter}张牌 (增加了${cardsAdded}张)`);
+
+      // 验证罚牌是否成功
+      if (cardsAdded === 0) {
+        console.log(`❌ [${timestamp}] 罚牌失败：没有牌被添加到手牌`);
+        console.log(`🔍 [${timestamp}] 失败原因分析:`);
+        console.log(`   - 牌堆大小: ${this.gameState.deck.length}`);
+        console.log(`   - 弃牌堆大小: ${this.gameHistory.length}`);
+        console.log(`   - 洗牌是否成功: ${this.gameState.deck.length > 0 ? '有牌可用' : '无牌可用'}`);
+
+        // 即使没有牌，也要通知状态变化，避免卡死
+        console.log(`📢 [${timestamp}] 通知状态变化 (失败情况)`);
+        this.notifyStateChange();
+        return false;
       }
 
-      const penaltyCard = this.gameState.deck[0];
-      this.gameState.deck = this.gameState.deck.slice(1);
-      penaltyCards.push(penaltyCard);
+      console.log(`🃏 [${timestamp}] 被罚的牌详情: ${penaltyCards.map(card => card.name).join(', ')}`);
 
+      // 更新罚牌计数
       if (player === 'human') {
-        this.gameState.playerHand.push(penaltyCard);
-        console.log(`✅ 玩家获得罚牌: ${penaltyCard.name} (${penaltyCard.culture}, ${penaltyCard.type})`);
+        this.gameState.penalties.player++;
+        console.log(`📊 [${timestamp}] 玩家罚牌次数更新: ${this.gameState.penalties.player}`);
       } else {
-        this.gameState.aiHand.push(penaltyCard);
-        console.log(`✅ AI获得罚牌: ${penaltyCard.name} (${penaltyCard.culture}, ${penaltyCard.type})`);
+        this.gameState.penalties.ai++;
+        console.log(`📊 [${timestamp}] AI罚牌次数更新: ${this.gameState.penalties.ai}`);
       }
 
-      cardsAdded++;
-    }
+      // 通知状态变化
+      console.log(`📢 [${timestamp}] 通知状态变化 (成功情况)`);
+      this.notifyStateChange();
 
-    const handAfter = player === 'human' ? this.gameState.playerHand.length : this.gameState.aiHand.length;
+      console.log(`✅ [${timestamp}] ${player === 'human' ? '玩家' : 'AI'}罚牌完成 - 总耗时: ${Date.now() - timestamp}ms`);
+      return true;
 
-    // 验证罚牌是否成功
-    if (cardsAdded === 0) {
-      console.log('❌ 罚牌失败：没有牌被添加到手牌');
+    } catch (error) {
+      const err = error as Error;
+      console.error(`❌ [${timestamp}] 罚牌过程中发生错误:`, err);
+      console.error(`🔍 [${timestamp}] 错误详情:`, {
+        player,
+        handBefore,
+        cardsAdded,
+        deckSize: this.gameState.deck.length,
+        discardSize: this.gameHistory.length,
+        error: err.message
+      });
+
+      // 发生错误时也要通知状态变化，避免卡死
+      console.log(`📢 [${timestamp}] 错误情况下通知状态变化`);
+      this.notifyStateChange();
       return false;
     }
-
-    console.log(`📊 罚牌结果: ${handBefore} → ${handAfter}张牌 (增加了${cardsAdded}张)`);
-    console.log(`🃏 被罚的牌: ${penaltyCards.map(card => card.name).join(', ')}`);
-
-    // 更新罚牌计数
-    if (player === 'human') {
-      this.gameState.penalties.player++;
-      console.log(`📊 玩家罚牌次数: ${this.gameState.penalties.player}`);
-    } else {
-      this.gameState.penalties.ai++;
-      console.log(`📊 AI罚牌次数: ${this.gameState.penalties.ai}`);
-    }
-
-    // 通知状态变化
-    this.notifyStateChange();
-
-    console.log(`✅ ${player === 'human' ? '玩家' : 'AI'}罚牌完成`);
-    return true;
   }
 
   // 洗牌机制 - 将弃牌堆重新洗入牌堆

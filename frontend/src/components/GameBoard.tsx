@@ -31,41 +31,55 @@ const GameBoard: React.FC<GameBoardProps> = ({ difficulty = 'medium' }) => {
     });
 
     engine.setStateChangeCallback((newState) => {
+      const timestamp = Date.now();
       const prevState = prevGameStateRef.current;
 
-      console.log('🎮 前端收到状态变化:');
-      console.log(`👤 玩家手牌: ${prevState?.playerHand.length || 0} → ${newState.playerHand.length}`);
-      console.log(`🤖 AI手牌: ${prevState?.aiHand.length || 0} → ${newState.aiHand.length}`);
-      console.log(`🃏 牌堆剩余: ${newState.deck.length}`);
-      console.log(`📊 罚牌统计: 玩家${newState.penalties.player} | AI${newState.penalties.ai}`);
-      console.log(`🎯 当前玩家: ${newState.currentPlayer}`);
-      console.log(`🃏 当前牌: ${newState.currentCard?.name || '无'}`);
+      console.log(`🎮 [${timestamp}] 前端收到状态变化`);
+      console.log(`👤 [${timestamp}] 玩家手牌: ${prevState?.playerHand.length || 0} → ${newState.playerHand.length}`);
+      console.log(`🤖 [${timestamp}] AI手牌: ${prevState?.aiHand.length || 0} → ${newState.aiHand.length}`);
+      console.log(`🃏 [${timestamp}] 牌堆剩余: ${newState.deck.length}`);
+      console.log(`📊 [${timestamp}] 罚牌统计: 玩家${newState.penalties.player} | AI${newState.penalties.ai}`);
+      console.log(`🎯 [${timestamp}] 当前玩家: ${newState.currentPlayer}`);
+      console.log(`🃏 [${timestamp}] 当前牌: ${newState.currentCard?.name || '无'}`);
+      console.log(`🎭 [${timestamp}] 游戏阶段: ${newState.gamePhase}`);
 
       // 检查是否有手牌变化（罚牌）
       const playerHandChanged = (prevState?.playerHand.length || 0) !== newState.playerHand.length;
       const aiHandChanged = (prevState?.aiHand.length || 0) !== newState.aiHand.length;
 
       if (playerHandChanged) {
-        console.log('🎯 玩家手牌发生变化，可能是罚牌结果');
+        console.log(`🎯 [${timestamp}] 玩家手牌发生变化，可能是罚牌结果 (+${newState.playerHand.length - (prevState?.playerHand.length || 0)})`);
       }
       if (aiHandChanged) {
-        console.log('🎯 AI手牌发生变化，可能是罚牌结果');
+        console.log(`🎯 [${timestamp}] AI手牌发生变化，可能是罚牌结果 (+${newState.aiHand.length - (prevState?.aiHand.length || 0)})`);
       }
 
       // 检查是否需要启动叫牌倒计时
       if (newState.currentPlayer === 'human' && newState.playerHand.length === 1 && newState.gamePhase === 'playing') {
-        console.log('⏰ 玩家只剩一张牌，开始5秒叫牌倒计时');
+        console.log(`⏰ [${timestamp}] 玩家只剩一张牌，开始5秒叫牌倒计时`);
+        console.log(`🔍 [${timestamp}] 叫牌倒计时条件满足:`, {
+          currentPlayer: newState.currentPlayer,
+          playerHandSize: newState.playerHand.length,
+          gamePhase: newState.gamePhase
+        });
         startMinpaiCountdown();
       } else {
+        console.log(`🔍 [${timestamp}] 叫牌倒计时条件不满足:`, {
+          currentPlayer: newState.currentPlayer,
+          playerHandSize: newState.playerHand.length,
+          gamePhase: newState.gamePhase
+        });
         // 取消倒计时
         clearMinpaiCountdown();
       }
+
+      console.log(`🔄 [${timestamp}] 开始更新React状态...`);
 
       // 🔧 强制更新状态，确保UI重新渲染
       setGameState(prevState => {
         // 如果状态没有实质性变化，强制创建一个新对象
         if (JSON.stringify(prevState) === JSON.stringify(newState)) {
-          console.log('⚠️ 检测到状态无变化，强制更新');
+          console.log(`⚠️ [${timestamp}] 检测到状态无变化，强制更新`);
           return { ...newState, _forceUpdate: Date.now() };
         }
         return newState;
@@ -73,7 +87,7 @@ const GameBoard: React.FC<GameBoardProps> = ({ difficulty = 'medium' }) => {
 
       prevGameStateRef.current = { ...newState };
 
-      console.log('✅ 前端状态更新完成\n');
+      console.log(`✅ [${timestamp}] 前端状态更新完成 - 总耗时: ${Date.now() - timestamp}ms\n`);
     });
 
     engine.setGameEndCallback((winner, finalState) => {
@@ -147,35 +161,62 @@ const GameBoard: React.FC<GameBoardProps> = ({ difficulty = 'medium' }) => {
 
   // 开始叫牌倒计时
   const startMinpaiCountdown = () => {
+    const timestamp = Date.now();
+    console.log(`⏰ [${timestamp}] 开始5秒叫牌倒计时`);
+    console.log(`🔍 [${timestamp}] 当前游戏状态:`, {
+      currentPlayer: gameState?.currentPlayer,
+      playerHandSize: gameState?.playerHand.length,
+      aiHandSize: gameState?.aiHand.length,
+      gamePhase: gameState?.gamePhase
+    });
+
     // 清除之前的倒计时
     clearMinpaiCountdown();
 
-    console.log('⏰ 开始5秒叫牌倒计时');
     setMinpaiCountdown(5);
 
     countdownRef.current = setInterval(() => {
       setMinpaiCountdown(prev => {
+        const currentTime = Date.now();
+        console.log(`⏰ [${currentTime}] 倒计时检查 - 当前值: ${prev}`);
+
         if (prev === null || prev <= 1) {
           // 倒计时结束，AI处罚玩家
-          console.log('⏰ 倒计时结束，AI处罚玩家');
+          console.log(`⏰ [${currentTime}] 倒计时结束，AI处罚玩家`);
+          console.log(`📊 [${currentTime}] 倒计时总耗时: ${currentTime - timestamp}ms`);
           clearMinpaiCountdown();
 
           // 直接罚牌玩家
           if (gameEngine) {
-            console.log('⚠️ 玩家未在5秒内叫牌，自动罚牌');
+            console.log(`⚠️ [${currentTime}] 玩家未在5秒内叫牌，自动罚牌`);
+            console.log(`🔍 [${currentTime}] 游戏引擎状态:`, gameEngine ? '可用' : '不可用');
 
-            // 调用游戏引擎的超时罚牌方法
-            const result = gameEngine.timeoutPenalty('human');
+            try {
+              // 调用游戏引擎的超时罚牌方法
+              const result = gameEngine.timeoutPenalty('human');
+              console.log(`📊 [${currentTime}] 罚牌结果:`, result);
 
-            if (result.success) {
-              showGameMessage('⏰ 时间到！未叫牌，自动罚牌');
+              if (result.success) {
+                console.log(`✅ [${currentTime}] 罚牌成功，显示消息`);
+                showGameMessage('⏰ 时间到！未叫牌，自动罚牌');
+              } else {
+                console.log(`❌ [${currentTime}] 罚牌失败: ${result.message}`);
+                showGameMessage('⚠️ 罚牌失败，请继续游戏');
+              }
+            } catch (error) {
+              console.error(`❌ [${currentTime}] 罚牌过程中发生错误:`, error);
+              showGameMessage('⚠️ 系统错误，请刷新页面');
             }
+          } else {
+            console.error(`❌ [${currentTime}] 游戏引擎不可用`);
           }
 
           return null;
         }
-        console.log(`⏰ 倒计时: ${prev - 1}秒`);
-        return prev - 1;
+
+        const newValue = prev - 1;
+        console.log(`⏰ [${currentTime}] 倒计时更新: ${prev} → ${newValue}`);
+        return newValue;
       });
     }, 1000);
   };
