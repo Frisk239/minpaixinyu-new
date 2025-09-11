@@ -118,7 +118,7 @@ const GameSettings: React.FC<GameSettingsProps> = ({ onStartGame }) => {
             </div>
             <div className="rule-item">
               <span className="rule-icon">🗣️</span>
-              <span className="rule-text">手牌剩1张时可叫"闽派！"</span>
+              <span className="rule-text">只剩一张手牌时，必须叫闽派，超时未叫，罚两张手牌</span>
             </div>
             <div className="rule-item">
               <span className="rule-icon">🏆</span>

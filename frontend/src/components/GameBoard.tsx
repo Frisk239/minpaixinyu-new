@@ -363,8 +363,12 @@ const GameBoard: React.FC<GameBoardProps> = ({ difficulty = 'medium' }) => {
             </div>
             <div className="ai-hand">
               {Array.from({ length: gameState.aiHand.length }, (_, i) => (
-                <div key={i} className="card-back">
-                  <div className="card-pattern">🎴</div>
+                <div key={i} className="ai-card">
+                  <img
+                    src="/static/game-card/闽派新语.png"
+                    alt="AI卡牌背面"
+                    className="ai-card-image"
+                  />
                 </div>
               ))}
             </div>
@@ -497,17 +501,14 @@ const CardDisplay: React.FC<CardDisplayProps> = ({ card, isCurrent = false, isPl
         boxShadow: isPlayable ? `0 0 20px ${CULTURE_COLORS[card.culture]}40` : undefined
       }}
     >
-      <div className="card-header">
-        <span className="card-culture">{CULTURE_NAMES[card.culture]}</span>
-        <span className="card-type">{CARD_TYPE_NAMES[card.type]}</span>
-      </div>
-
       <div className="card-image">
         <img src={card.image} alt={card.name} />
-      </div>
-
-      <div className="card-name">
-        {card.name}
+        <div className="card-overlay">
+          <div className="card-info">
+            <div className="card-culture-text">{CULTURE_NAMES[card.culture]}</div>
+            <div className="card-type-text">{CARD_TYPE_NAMES[card.type]}</div>
+          </div>
+        </div>
       </div>
 
       {isPlayable && (

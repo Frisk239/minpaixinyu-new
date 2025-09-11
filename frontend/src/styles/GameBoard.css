@@ -1,9 +1,17 @@
+/* 自定义字体声明 */
+@font-face {
+  font-family: 'HanyiKaiTi';
+  src: url('/static/font/汉仪楷体简.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
 /* 游戏主界面样式 */
 .game-board {
   position: relative;
   min-height: 100vh;
   overflow-x: hidden;
-  font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif;
+  font-family: 'HanyiKaiTi', 'Microsoft YaHei', 'PingFang SC', sans-serif;
 }
 
 /* 游戏背景 */
@@ -76,8 +84,35 @@
 .ai-hand {
   display: flex;
   justify-content: center;
-  gap: 10px;
+  gap: 16px;
   flex-wrap: wrap;
+  margin-top: 20px;
+  position: relative;
+  min-height: 160px;
+  max-width: 1600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* AI卡牌样式 */
+.ai-card {
+  width: 90px;
+  height: 135px;
+  background: white;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border: 3px solid rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.ai-card-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 9px;
 }
 
 .card-back {
@@ -244,17 +279,20 @@
 .player-hand {
   display: flex;
   justify-content: center;
-  gap: 15px;
+  gap: 16px;
   flex-wrap: wrap;
   margin-top: 20px;
   position: relative;
   min-height: 160px;
+  max-width: 1600px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 /* 卡牌样式 */
 .card-display {
-  width: 100px;
-  height: 150px;
+  width: 90px;
+  height: 135px;
   background: white;
   border-radius: 12px;
   display: flex;
@@ -301,16 +339,57 @@
 .card-image {
   flex: 1;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 8px;
+  align-items: stretch;
+  justify-content: stretch;
+  padding: 0;
+  overflow: hidden;
 }
 
 .card-image img {
-  max-width: 100%;
-  max-height: 100%;
-  object-fit: contain;
-  border-radius: 4px;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+/* 卡牌悬浮遮罩层 */
+.card-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(2px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  border-radius: 8px;
+  pointer-events: none;
+}
+
+.card-display:hover .card-overlay {
+  opacity: 1;
+}
+
+.card-info {
+  text-align: center;
+  color: white;
+  font-weight: 600;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+.card-culture-text {
+  font-size: 1rem;
+  margin-bottom: 4px;
+  color: #fff;
+}
+
+.card-type-text {
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.9);
 }
 
 .card-name {
@@ -500,6 +579,7 @@
 
   .player-hand {
     gap: 8px;
+    max-width: 100%;
   }
 
   .card-display {

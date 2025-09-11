@@ -1,9 +1,17 @@
+/* 自定义字体声明 */
+@font-face {
+  font-family: 'HanyiKaiTi';
+  src: url('/static/font/汉仪楷体简.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
 /* 游戏设置页面样式 */
 .game-settings {
   position: relative;
   min-height: 100vh;
   overflow-x: hidden;
-  font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif;
+  font-family: 'HanyiKaiTi', 'Microsoft YaHei', 'PingFang SC', sans-serif;
 }
 
 /* 背景 */
