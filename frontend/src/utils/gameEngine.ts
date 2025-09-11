@@ -111,20 +111,25 @@ export class GameEngine {
     }
 
     // 检查玩家是否还有可出的牌
+    console.log('🔍 开始检查玩家可出牌...');
+    console.log('📋 当前玩家手牌:', this.gameState.playerHand.map(card => `${card.name}(${card.culture},${card.type})`));
+    console.log('🎯 当前牌:', this.gameState.currentCard ? `${this.gameState.currentCard.name}(${this.gameState.currentCard.culture},${this.gameState.currentCard.type})` : '无');
+
     const playerPlayableCards = getPlayableCards(this.gameState.playerHand, this.gameState.currentCard);
-    if (playerPlayableCards.length === 0) {
-      console.log('⚠️ 玩家没有可出的牌，执行罚牌');
-      const penaltySuccess = this.applyPenalty('human');
+    console.log('🎲 可出牌数量:', playerPlayableCards.length);
+    console.log('🎴 可出牌列表:', playerPlayableCards.map(card => `${card.name}(${card.culture},${card.type})`));
 
-      if (penaltySuccess) {
-        // 等待状态更新，确保UI显示新手牌
-        await new Promise(resolve => setTimeout(resolve, 200));
-        console.log('⏳ 等待玩家罚牌状态更新完成');
-      }
-    }
+    // 强制检查函数
+    const forceCheckPlayable = () => {
+      const playable = getPlayableCards(this.gameState.playerHand, this.gameState.currentCard);
+      console.log('🔧 强制检查结果:', playable.length === 0 ? '无牌可出' : `有${playable.length}张牌可出`);
+      return playable.length === 0;
+    };
 
-    // 切换到AI回合
-    console.log('🔄 切换到AI回合');
+    // 移除后端的罚牌逻辑，统一由前端状态变化回调处理
+
+    // 玩家有可出牌，正常切换到AI回合
+    console.log('🔄 玩家有可出牌，切换到AI回合');
     this.gameState.currentPlayer = 'ai';
     this.notifyStateChange();
 
@@ -190,22 +195,8 @@ export class GameEngine {
           console.log('🎮 游戏继续 - 准备切换到玩家回合');
         }
       } else {
-        // AI没有可出牌，罚牌
-        console.log('⚠️ AI无牌可出，执行罚牌');
-        const penaltySuccess = this.applyPenalty('ai');
-
-        if (penaltySuccess) {
-          // 等待状态更新，确保UI显示新手牌
-          await new Promise(resolve => setTimeout(resolve, 200));
-          console.log('⏳ 等待AI罚牌状态更新完成');
-        }
-
-        // 检查游戏是否结束
-        if (isGameFinished(this.gameState.playerHand, this.gameState.aiHand)) {
-          console.log('🏁 游戏结束检查: 游戏已结束');
-          this.endGame();
-          return;
-        }
+        // AI没有可出牌，移除罚牌逻辑，统一由前端状态变化回调处理
+        console.log('⚠️ AI无牌可出，等待前端处理');
       }
     } catch (error) {
       console.error('❌ AI决策失败:', error);
@@ -222,15 +213,7 @@ export class GameEngine {
           return;
         }
       } else {
-        console.log('⚠️ 前端AI也无牌可出，执行罚牌');
-        this.applyPenalty('ai');
-
-        // 检查游戏是否结束
-        if (isGameFinished(this.gameState.playerHand, this.gameState.aiHand)) {
-          console.log('🏁 游戏结束检查: 游戏已结束');
-          this.endGame();
-          return;
-        }
+        console.log('⚠️ 前端AI也无牌可出，等待前端处理');
       }
     }
 

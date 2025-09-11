@@ -22,6 +22,7 @@ const GameBoard: React.FC<GameBoardProps> = ({ difficulty = 'medium' }) => {
   const [minpaiCountdown, setMinpaiCountdown] = useState<number | null>(null); // 叫牌倒计时
   const prevGameStateRef = useRef<GameState | null>(null);
   const countdownRef = useRef<NodeJS.Timeout | null>(null);
+  const isPenaltyProcessingRef = useRef<boolean>(false); // 防止重复罚牌
 
   // 初始化游戏
   useEffect(() => {
@@ -29,6 +30,9 @@ const GameBoard: React.FC<GameBoardProps> = ({ difficulty = 'medium' }) => {
       aiDifficulty: difficulty,
       enableSound: true
     });
+
+    // 使用ref来存储引擎引用，确保回调中能正确访问
+    const engineRef = { current: engine };
 
     engine.setStateChangeCallback((newState) => {
       const timestamp = Date.now();
@@ -74,20 +78,109 @@ const GameBoard: React.FC<GameBoardProps> = ({ difficulty = 'medium' }) => {
       }
 
       console.log(`🔄 [${timestamp}] 开始更新React状态...`);
+      console.log(`🔍 [${timestamp}] 新状态详情:`, {
+        currentPlayer: newState.currentPlayer,
+        playerHandSize: newState.playerHand.length,
+        aiHandSize: newState.aiHand.length,
+        gamePhase: newState.gamePhase,
+        currentCard: newState.currentCard?.name || '无'
+      });
 
       // 🔧 强制更新状态，确保UI重新渲染
       setGameState(prevState => {
+        console.log(`🔄 [${timestamp}] setGameState回调被调用`);
         // 如果状态没有实质性变化，强制创建一个新对象
         if (JSON.stringify(prevState) === JSON.stringify(newState)) {
           console.log(`⚠️ [${timestamp}] 检测到状态无变化，强制更新`);
           return { ...newState, _forceUpdate: Date.now() };
         }
+        console.log(`✅ [${timestamp}] 状态有变化，正常更新`);
         return newState;
       });
 
       prevGameStateRef.current = { ...newState };
 
       console.log(`✅ [${timestamp}] 前端状态更新完成 - 总耗时: ${Date.now() - timestamp}ms\n`);
+
+      // 🔍 检查是否需要触发玩家回合逻辑
+      if (newState.currentPlayer === 'human' && newState.gamePhase === 'playing') {
+        console.log(`🎯 [${timestamp}] 切换到玩家回合，检查可出牌`);
+
+        // 使用ref中的引擎实例
+        const currentEngine = engineRef.current;
+        const playerPlayableCards = currentEngine?.getPlayableCards() || [];
+        console.log(`🎲 [${timestamp}] 玩家回合可出牌数量: ${playerPlayableCards.length}`);
+
+        if (playerPlayableCards.length === 0) {
+          console.log(`⚠️ [${timestamp}] 玩家回合无牌可出，自动执行罚牌`);
+
+          // 检查是否正在处理罚牌，防止重复执行
+          if (isPenaltyProcessingRef.current) {
+            console.log(`🚫 [${timestamp}] 罚牌正在处理中，跳过重复执行`);
+            return;
+          }
+
+          // 标记开始处理罚牌
+          isPenaltyProcessingRef.current = true;
+
+          // 使用游戏引擎的公共方法执行罚牌
+          if (currentEngine) {
+            try {
+              console.log(`🔄 [${timestamp}] 开始执行罚牌...`);
+
+              // 使用timeoutPenalty方法，它会调用applyPenalty
+              const penaltyResult = currentEngine.timeoutPenalty('human');
+
+              if (penaltyResult.success) {
+                console.log(`✅ [${timestamp}] 自动罚牌成功`);
+                // 强制触发状态更新
+                setTimeout(() => {
+                  console.log(`🔄 [${timestamp}] 罚牌后准备切换到AI回合`);
+                  if (currentEngine) {
+                    // 手动切换到AI回合
+                    const engine = currentEngine as any;
+                    if (engine && engine.gameState) {
+                      engine.gameState.currentPlayer = 'ai';
+                      engine.notifyStateChange();
+
+                      // 触发AI回合
+                      setTimeout(() => {
+                        if (engine.aiTurn) {
+                          engine.aiTurn().catch((error: any) => {
+                            console.error('AI回合执行失败:', error);
+                          });
+                        }
+                        // 重置罚牌处理标志
+                        isPenaltyProcessingRef.current = false;
+                      }, 500);
+                    } else {
+                      // 重置罚牌处理标志
+                      isPenaltyProcessingRef.current = false;
+                    }
+                  } else {
+                    // 重置罚牌处理标志
+                    isPenaltyProcessingRef.current = false;
+                  }
+                }, 300);
+              } else {
+                console.log(`❌ [${timestamp}] 自动罚牌失败: ${penaltyResult.message}`);
+                // 重置罚牌处理标志
+                isPenaltyProcessingRef.current = false;
+              }
+            } catch (error: any) {
+              console.error(`❌ [${timestamp}] 罚牌执行出错:`, error);
+              // 重置罚牌处理标志
+              isPenaltyProcessingRef.current = false;
+            }
+          } else {
+            console.log(`❌ [${timestamp}] 游戏引擎不可用`);
+            // 重置罚牌处理标志
+            isPenaltyProcessingRef.current = false;
+          }
+        } else {
+          console.log(`✅ [${timestamp}] 玩家回合有${playerPlayableCards.length}张牌可出`);
+        }
+      }
     });
 
     engine.setGameEndCallback((winner, finalState) => {
@@ -182,6 +275,11 @@ const GameBoard: React.FC<GameBoardProps> = ({ difficulty = 'medium' }) => {
 
         if (prev === null || prev <= 1) {
           // 倒计时结束，AI处罚玩家
+          console.log(`⏰ [${currentTime}] 倒计时结束，AI处罚玩家`);
+          console.log(`📊 [${currentTime}] 倒计时总耗时: ${currentTime - timestamp}ms`);
+          clearMinpaiCountdown();
+
+          // 倒计时结束，执行罚牌
           console.log(`⏰ [${currentTime}] 倒计时结束，AI处罚玩家`);
           console.log(`📊 [${currentTime}] 倒计时总耗时: ${currentTime - timestamp}ms`);
           clearMinpaiCountdown();
