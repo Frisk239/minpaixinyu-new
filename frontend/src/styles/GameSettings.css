@@ -1,0 +1,426 @@
+/* 游戏设置页面样式 */
+.game-settings {
+  min-height: 100vh;
+  position: relative;
+  font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif;
+}
+
+/* 背景 */
+.settings-background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  opacity: 0.1;
+}
+
+.settings-bg-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* 主要内容 */
+.settings-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 30px 20px;
+  position: relative;
+  z-index: 1;
+}
+
+/* 头部 */
+.settings-header {
+  text-align: center;
+  margin-bottom: 40px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  padding: 30px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.settings-header h1 {
+  margin: 0 0 10px 0;
+  color: #2c3e50;
+  font-size: 3rem;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.settings-header p {
+  margin: 0;
+  color: #7f8c8d;
+  font-size: 1.2rem;
+}
+
+.back-btn {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  padding: 10px 20px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 25px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+}
+
+.back-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+}
+
+/* 难度选择区域 */
+.difficulty-selection {
+  margin-bottom: 40px;
+}
+
+.difficulty-selection h2 {
+  text-align: center;
+  color: #2c3e50;
+  font-size: 2rem;
+  margin-bottom: 30px;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.difficulty-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 30px;
+  margin-bottom: 40px;
+}
+
+/* 难度卡片 */
+.difficulty-card {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  padding: 30px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: 3px solid rgba(255, 255, 255, 0.2);
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.difficulty-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+}
+
+.difficulty-card.selected {
+  transform: translateY(-5px);
+  animation: selected-pulse 2s infinite;
+}
+
+@keyframes selected-pulse {
+  0%, 100% {
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+  }
+  50% {
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.25), 0 0 30px rgba(255, 215, 0, 0.3);
+  }
+}
+
+/* 卡片头部 */
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.card-header h3 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.time-badge {
+  background: rgba(0, 0, 0, 0.1);
+  padding: 5px 12px;
+  border-radius: 15px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #34495e;
+}
+
+/* 卡片描述 */
+.card-description {
+  color: #7f8c8d;
+  font-size: 1rem;
+  line-height: 1.5;
+  margin-bottom: 20px;
+}
+
+/* AI特点 */
+.ai-features {
+  margin-bottom: 20px;
+}
+
+.ai-features h4 {
+  margin: 0 0 10px 0;
+  color: #2c3e50;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.ai-features ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.ai-features li {
+  padding: 5px 0;
+  color: #34495e;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+}
+
+.ai-features li:before {
+  content: "•";
+  color: #3498db;
+  font-weight: bold;
+  margin-right: 8px;
+}
+
+/* 选择指示器 */
+.selected-indicator {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  color: white;
+  padding: 8px 15px;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* 悬停效果 */
+.card-hover-effect {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.difficulty-card:hover .card-hover-effect {
+  opacity: 1;
+}
+
+/* 游戏信息 */
+.game-info {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  padding: 30px;
+  margin-bottom: 40px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.game-info h3 {
+  text-align: center;
+  color: #2c3e50;
+  font-size: 1.8rem;
+  margin-bottom: 25px;
+}
+
+.rules-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+}
+
+.rule-item {
+  display: flex;
+  align-items: center;
+  padding: 15px;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 12px;
+  border-left: 4px solid #3498db;
+  transition: all 0.3s ease;
+}
+
+.rule-item:hover {
+  transform: translateX(5px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.rule-icon {
+  font-size: 1.5rem;
+  margin-right: 15px;
+  min-width: 30px;
+}
+
+.rule-text {
+  color: #34495e;
+  font-size: 1rem;
+  line-height: 1.4;
+}
+
+/* 操作按钮 */
+.settings-actions {
+  text-align: center;
+}
+
+.start-game-btn {
+  padding: 20px 40px;
+  border: none;
+  border-radius: 30px;
+  color: white;
+  font-size: 1.3rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  position: relative;
+  overflow: hidden;
+}
+
+.start-game-btn:before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s;
+}
+
+.start-game-btn:hover:before {
+  left: 100%;
+}
+
+.start-game-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.4);
+}
+
+.start-game-btn:active {
+  transform: translateY(-1px);
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .settings-content {
+    padding: 20px 15px;
+  }
+
+  .settings-header {
+    padding: 20px;
+  }
+
+  .settings-header h1 {
+    font-size: 2.2rem;
+  }
+
+  .difficulty-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .difficulty-card {
+    padding: 20px;
+  }
+
+  .card-header {
+    flex-direction: column;
+    gap: 10px;
+    align-items: flex-start;
+  }
+
+  .rules-grid {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+
+  .start-game-btn {
+    padding: 15px 30px;
+    font-size: 1.1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .settings-header h1 {
+    font-size: 1.8rem;
+  }
+
+  .difficulty-selection h2 {
+    font-size: 1.5rem;
+  }
+
+  .difficulty-card {
+    padding: 15px;
+  }
+
+  .card-header h3 {
+    font-size: 1.3rem;
+  }
+
+  .game-info {
+    padding: 20px;
+  }
+
+  .game-info h3 {
+    font-size: 1.5rem;
+  }
+
+  .rule-item {
+    padding: 12px;
+  }
+
+  .rule-icon {
+    font-size: 1.3rem;
+    margin-right: 12px;
+  }
+
+  .start-game-btn {
+    padding: 12px 25px;
+    font-size: 1rem;
+  }
+}
+
+/* 动画增强 */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.difficulty-card {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+.difficulty-card:nth-child(1) { animation-delay: 0.1s; }
+.difficulty-card:nth-child(2) { animation-delay: 0.2s; }
+.difficulty-card:nth-child(3) { animation-delay: 0.3s; }
+
+.rule-item {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+.rule-item:nth-child(1) { animation-delay: 0.1s; }
+.rule-item:nth-child(2) { animation-delay: 0.2s; }
+.rule-item:nth-child(3) { animation-delay: 0.3s; }
+.rule-item:nth-child(4) { animation-delay: 0.4s; }

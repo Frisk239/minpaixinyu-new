@@ -730,6 +730,50 @@ def get_expert_files(city_name):
         print(f"获取专家文件列表失败: {str(e)}")
         return jsonify({'error': '获取专家文件列表失败'}), 500
 
+# 游戏AI决策API
+@app.route('/api/game/ai-decision', methods=['POST'])
+def game_ai_decision():
+    """游戏AI决策接口"""
+    try:
+        user_id = session.get('user_id')
+        if not user_id:
+            return jsonify({'error': '未登录'}), 401
+
+        data = request.get_json()
+        if not data:
+            return jsonify({'error': '缺少游戏状态数据'}), 400
+
+        game_state = data.get('gameState')
+        difficulty = data.get('difficulty', 'medium')
+
+        if not game_state:
+            return jsonify({'error': '缺少游戏状态'}), 400
+
+        # 导入AI服务
+        from game_ai_service import make_ai_decision
+
+        # 调用AI决策
+        result = make_ai_decision(game_state, difficulty)
+
+        if result['success']:
+            return jsonify({
+                'success': True,
+                'card': result['card'],
+                'decision_time': result['decision_time'],
+                'difficulty': result['difficulty']
+            }), 200
+        else:
+            return jsonify({
+                'success': False,
+                'error': result.get('error', 'AI决策失败')
+            }), 500
+
+    except Exception as e:
+        print(f"AI决策API错误: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({'error': 'AI服务暂时不可用'}), 500
+
 # 静态文件路由
 @app.route('/static/<path:filename>')
 def static_files(filename):

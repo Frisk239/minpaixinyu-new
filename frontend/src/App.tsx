@@ -13,6 +13,7 @@ import QuizSelection from './components/QuizSelection';
 import Quiz from './components/Quiz';
 import QuizResult from './components/QuizResult';
 import Profile from './components/Profile';
+import GameEntry from './components/GameEntry';
 import Navbar from './components/Navbar';
 import './App.css';
 
@@ -225,6 +226,14 @@ function App() {
                   onBack={() => {}}
                   onViewStats={() => {}}
                 /> :
+                <Navigate to="/" replace />
+            }
+          />
+          <Route
+            path="/card-game"
+            element={
+              authState.isAuthenticated ?
+                <GameEntry /> :
                 <Navigate to="/" replace />
             }
           />
