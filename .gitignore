@@ -251,3 +251,6 @@ backend/data/*.sqlite3
 
 # Static files (keep directory structure but ignore large files if needed)
 # frontend/static/large_files/
+
+# Game card images (too large for git)
+frontend/static/game-card/

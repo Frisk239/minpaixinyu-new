@@ -109,11 +109,19 @@
   overflow: hidden;
 }
 
+/* 覆盖City.css中的样式，针对QuizSelection页面 */
+.quiz-selection-container .city-image-container {
+  min-height: 200px !important;
+  height: 200px !important;
+  max-height: none !important;
+}
+
 .city-image {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
   transition: transform 0.4s ease;
+  background-color: rgba(255, 255, 255, 0.1);
 }
 
 .city-card:hover .city-image {
@@ -345,7 +353,14 @@
   }
 
   .city-image-container {
-    height: 180px;
+    height: 130px;
+  }
+
+  /* 覆盖City.css中的样式，针对平板端 */
+  .quiz-selection-container .city-image-container {
+    min-height: 130px !important;
+    height: 130px !important;
+    max-height: none !important;
   }
 
   .city-name {
@@ -385,7 +400,14 @@
   }
 
   .city-image-container {
-    height: 150px;
+    height: 140px;
+  }
+
+  /* 覆盖City.css中的样式，针对手机端 */
+  .quiz-selection-container .city-image-container {
+    min-height: 140px !important;
+    height: 140px !important;
+    max-height: none !important;
   }
 
   .city-name {
