@@ -219,23 +219,55 @@
   font-size: 1rem;
 }
 
-.countdown-warning {
-  color: #e74c3c !important;
-  font-size: 1.2rem !important;
-  font-weight: 700 !important;
+/* 叫牌倒计时显示 */
+.countdown-display {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  margin: 15px 0;
+  padding: 15px 20px;
+  background: linear-gradient(135deg, rgba(231, 76, 60, 0.1), rgba(192, 57, 43, 0.1));
+  border: 2px solid rgba(231, 76, 60, 0.3);
+  border-radius: 15px;
   animation: countdown-pulse 1s infinite;
-  text-shadow: 0 0 10px rgba(231, 76, 60, 0.5);
-  margin: 10px 0 !important;
+  box-shadow: 0 4px 15px rgba(231, 76, 60, 0.2);
+}
+
+.countdown-timer {
+  font-size: 2.5rem;
+  font-weight: 900;
+  color: #e74c3c;
+  text-shadow: 0 0 15px rgba(231, 76, 60, 0.8);
+  animation: countdown-number 1s infinite;
+}
+
+.countdown-text {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #c0392b;
+  text-align: center;
 }
 
 @keyframes countdown-pulse {
   0%, 100% {
     transform: scale(1);
     opacity: 1;
+    box-shadow: 0 4px 15px rgba(231, 76, 60, 0.2);
   }
   50% {
-    transform: scale(1.05);
-    opacity: 0.8;
+    transform: scale(1.02);
+    opacity: 0.9;
+    box-shadow: 0 6px 20px rgba(231, 76, 60, 0.4);
+  }
+}
+
+@keyframes countdown-number {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
   }
 }
 

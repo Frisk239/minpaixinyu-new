@@ -114,10 +114,17 @@ export class GameEngine {
     const playerPlayableCards = getPlayableCards(this.gameState.playerHand, this.gameState.currentCard);
     if (playerPlayableCards.length === 0) {
       console.log('⚠️ 玩家没有可出的牌，执行罚牌');
-      this.applyPenalty('human');
+      const penaltySuccess = this.applyPenalty('human');
+
+      if (penaltySuccess) {
+        // 等待状态更新，确保UI显示新手牌
+        await new Promise(resolve => setTimeout(resolve, 200));
+        console.log('⏳ 等待玩家罚牌状态更新完成');
+      }
     }
 
     // 切换到AI回合
+    console.log('🔄 切换到AI回合');
     this.gameState.currentPlayer = 'ai';
     this.notifyStateChange();
 
@@ -185,7 +192,13 @@ export class GameEngine {
       } else {
         // AI没有可出牌，罚牌
         console.log('⚠️ AI无牌可出，执行罚牌');
-        this.applyPenalty('ai');
+        const penaltySuccess = this.applyPenalty('ai');
+
+        if (penaltySuccess) {
+          // 等待状态更新，确保UI显示新手牌
+          await new Promise(resolve => setTimeout(resolve, 200));
+          console.log('⏳ 等待AI罚牌状态更新完成');
+        }
 
         // 检查游戏是否结束
         if (isGameFinished(this.gameState.playerHand, this.gameState.aiHand)) {
@@ -263,72 +276,92 @@ export class GameEngine {
     this.gameState.roundCount++;
   }
 
-  // 叫"闽派" - 惩罚机制
+  // 叫"闽派" - 简化机制
   callMinpai(): { success: boolean; message?: string } {
     if (this.gameState.gamePhase !== 'playing' || this.gameState.currentPlayer !== 'human') {
       return { success: false, message: '现在不是你的回合' };
     }
 
-    if (!canCallMinpai(this.gameState.playerHand)) {
+    if (this.gameState.playerHand.length !== 1) {
       return { success: false, message: '你不能叫闽派' };
     }
 
+    // 标记叫牌成功
     this.gameState.playerCalledMinpai = true;
     console.log('🗣️ 玩家叫了闽派！');
 
-    // 检查AI是否举报 - AI监察机制
-    const shouldReport = this.shouldReportMinpai();
-    console.log(`🔍 AI监察结果: ${shouldReport ? '举报成功' : '举报失败'}`);
+    // 通知状态变化（UI更新）
+    this.notifyStateChange();
 
-    if (shouldReport) {
-      // AI举报成功，玩家罚牌
-      console.log('⚠️ AI举报成功，玩家被罚牌');
-      this.applyPenalty('human');
-      return { success: false, message: 'AI举报成功！你被罚牌' };
+    return { success: true, message: '叫牌成功！' };
+  }
+
+  // 超时罚牌 - 公共方法
+  timeoutPenalty(player: 'human' | 'ai'): { success: boolean; message?: string } {
+    console.log(`⏰ ${player === 'human' ? '玩家' : 'AI'}超时罚牌`);
+
+    const penaltySuccess = this.applyPenalty(player);
+
+    if (penaltySuccess) {
+      return { success: true, message: '超时罚牌成功' };
     } else {
-      // 叫牌成功，AI罚牌
-      console.log('✅ 叫牌成功，AI被罚牌');
-      this.applyPenalty('ai');
-      return { success: true, message: '叫牌成功！AI被罚牌' };
+      return { success: false, message: '罚牌失败' };
     }
   }
 
-  // AI监察机制 - 所有AI都准确监察
-  private shouldReportMinpai(): boolean {
-    // 所有AI都100%准确举报叫牌
-    console.log('🎯 AI准确监察: 举报成功');
-    return true;
-  }
+
 
   // 应用罚牌
-  private applyPenalty(player: 'human' | 'ai') {
-    console.log(`🃏 ${player === 'human' ? '玩家' : 'AI'}执行罚牌`);
+  private applyPenalty(player: 'human' | 'ai'): boolean {
+    console.log(`🃏 ${player === 'human' ? '玩家' : 'AI'}开始执行罚牌`);
+
+    const handBefore = player === 'human' ? this.gameState.playerHand.length : this.gameState.aiHand.length;
+    let cardsAdded = 0;
+    const penaltyCards: Card[] = [];
 
     // 抽取两张牌
     for (let i = 0; i < 2; i++) {
       // 如果牌堆空了，需要洗牌
       if (this.gameState.deck.length === 0) {
-        console.log('🃏 牌堆已空，执行洗牌');
-        this.shuffleDiscardPile();
+        console.log('🃏 牌堆已空，尝试洗牌');
+        const shuffleSuccess = this.shuffleDiscardPile();
+        if (!shuffleSuccess) {
+          console.log('🃏 无法洗牌，停止罚牌');
+          break;
+        }
       }
 
-      // 如果还是没有牌，说明游戏应该结束了
+      // 如果还是没有牌，停止罚牌
       if (this.gameState.deck.length === 0) {
-        console.log('🃏 没有足够的牌进行罚牌');
+        console.log('🃏 牌堆仍然为空，无法继续罚牌');
         break;
       }
 
       const penaltyCard = this.gameState.deck[0];
       this.gameState.deck = this.gameState.deck.slice(1);
+      penaltyCards.push(penaltyCard);
 
       if (player === 'human') {
         this.gameState.playerHand.push(penaltyCard);
-        console.log(`🃏 玩家获得罚牌: ${penaltyCard.name}`);
+        console.log(`✅ 玩家获得罚牌: ${penaltyCard.name} (${penaltyCard.culture}, ${penaltyCard.type})`);
       } else {
         this.gameState.aiHand.push(penaltyCard);
-        console.log(`🃏 AI获得罚牌: ${penaltyCard.name}`);
+        console.log(`✅ AI获得罚牌: ${penaltyCard.name} (${penaltyCard.culture}, ${penaltyCard.type})`);
       }
+
+      cardsAdded++;
     }
+
+    const handAfter = player === 'human' ? this.gameState.playerHand.length : this.gameState.aiHand.length;
+
+    // 验证罚牌是否成功
+    if (cardsAdded === 0) {
+      console.log('❌ 罚牌失败：没有牌被添加到手牌');
+      return false;
+    }
+
+    console.log(`📊 罚牌结果: ${handBefore} → ${handAfter}张牌 (增加了${cardsAdded}张)`);
+    console.log(`🃏 被罚的牌: ${penaltyCards.map(card => card.name).join(', ')}`);
 
     // 更新罚牌计数
     if (player === 'human') {
@@ -341,10 +374,13 @@ export class GameEngine {
 
     // 通知状态变化
     this.notifyStateChange();
+
+    console.log(`✅ ${player === 'human' ? '玩家' : 'AI'}罚牌完成`);
+    return true;
   }
 
   // 洗牌机制 - 将弃牌堆重新洗入牌堆
-  private shuffleDiscardPile() {
+  private shuffleDiscardPile(): boolean {
     console.log('🔄 开始洗牌...');
 
     // 收集所有已出的牌（从游戏历史中）
@@ -357,10 +393,10 @@ export class GameEngine {
 
     console.log(`🃏 弃牌堆有 ${discardPile.length} 张牌`);
 
-    // 如果弃牌堆为空，说明游戏真的没有牌了
-    if (discardPile.length === 0) {
-      console.log('🃏 弃牌堆也为空，无法洗牌');
-      return;
+    // 检查是否有足够的牌
+    if (discardPile.length < 2) {
+      console.log('🃏 弃牌堆牌数不足，无法洗牌');
+      return false;
     }
 
     // 洗牌
@@ -373,6 +409,7 @@ export class GameEngine {
     this.gameHistory = [];
 
     console.log(`✅ 洗牌完成，牌堆现在有 ${this.gameState.deck.length} 张牌`);
+    return true;
   }
 
   // 结束游戏
@@ -426,7 +463,11 @@ export class GameEngine {
   // 通知状态变化
   private notifyStateChange() {
     if (this.onStateChange) {
-      this.onStateChange(this.gameState);
+      // 🔧 确保传递的是深拷贝，避免引用问题
+      const stateCopy = JSON.parse(JSON.stringify(this.gameState));
+      console.log('📢 通知状态变化 - 当前牌:', stateCopy.currentCard?.name || '无');
+      console.log('📢 通知状态变化 - 当前玩家:', stateCopy.currentPlayer);
+      this.onStateChange(stateCopy);
     }
   }
 
