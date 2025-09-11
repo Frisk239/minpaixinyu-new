@@ -263,7 +263,7 @@ export class GameEngine {
     this.gameState.roundCount++;
   }
 
-  // 叫"闽派"
+  // 叫"闽派" - 惩罚机制
   callMinpai(): { success: boolean; message?: string } {
     if (this.gameState.gamePhase !== 'playing' || this.gameState.currentPlayer !== 'human') {
       return { success: false, message: '现在不是你的回合' };
@@ -274,24 +274,30 @@ export class GameEngine {
     }
 
     this.gameState.playerCalledMinpai = true;
+    console.log('🗣️ 玩家叫了闽派！');
 
-    // 检查是否可以举报 - 简单AI逻辑
-    const shouldReport = this.config.aiDifficulty === 'hard' ?
-      Math.random() > 0.95 : // 困难AI很少误报
-      this.config.aiDifficulty === 'medium' ?
-        Math.random() > 0.8 : // 中等AI偶尔误报
-        Math.random() > 0.5; // 简单AI经常误报
+    // 检查AI是否举报 - AI监察机制
+    const shouldReport = this.shouldReportMinpai();
+    console.log(`🔍 AI监察结果: ${shouldReport ? '举报成功' : '举报失败'}`);
 
     if (shouldReport) {
       // AI举报成功，玩家罚牌
+      console.log('⚠️ AI举报成功，玩家被罚牌');
       this.applyPenalty('human');
       return { success: false, message: 'AI举报成功！你被罚牌' };
     } else {
-      // 叫牌成功，游戏结束
-      this.gameState.winner = 'human';
-      this.endGame();
-      return { success: true, message: '叫牌成功！你赢了！' };
+      // 叫牌成功，AI罚牌
+      console.log('✅ 叫牌成功，AI被罚牌');
+      this.applyPenalty('ai');
+      return { success: true, message: '叫牌成功！AI被罚牌' };
     }
+  }
+
+  // AI监察机制 - 所有AI都准确监察
+  private shouldReportMinpai(): boolean {
+    // 所有AI都100%准确举报叫牌
+    console.log('🎯 AI准确监察: 举报成功');
+    return true;
   }
 
   // 应用罚牌

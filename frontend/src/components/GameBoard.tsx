@@ -19,7 +19,9 @@ const GameBoard: React.FC<GameBoardProps> = ({ difficulty = 'medium' }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [message, setMessage] = useState<string>('');
   const [showMessage, setShowMessage] = useState(false);
+  const [minpaiCountdown, setMinpaiCountdown] = useState<number | null>(null); // 叫牌倒计时（隐藏）
   const prevGameStateRef = useRef<GameState | null>(null);
+  const countdownRef = useRef<NodeJS.Timeout | null>(null);
 
   // 初始化游戏
   useEffect(() => {
@@ -47,11 +49,14 @@ const GameBoard: React.FC<GameBoardProps> = ({ difficulty = 'medium' }) => {
         console.log('🔄 当前牌变化:', prevCurrentCard, '→', newCurrentCard);
       }
 
-      // 临时移除重复检测，先确保状态更新正常工作
-      console.log('🔄 状态对比:');
-      console.log('  - 玩家:', (prevState?.currentPlayer || '无') + ' → ' + newState.currentPlayer);
-      console.log('  - 当前牌:', prevCurrentCard + ' → ' + newCurrentCard);
-      console.log('  - 轮次:', (prevState?.roundCount || 0) + ' → ' + newState.roundCount);
+      // 检查是否需要启动叫牌倒计时
+      if (newState.currentPlayer === 'human' && newState.playerHand.length === 1 && newState.gamePhase === 'playing') {
+        console.log('⏰ 玩家只剩一张牌，开始3秒叫牌倒计时');
+        startMinpaiCountdown();
+      } else {
+        // 取消倒计时
+        clearMinpaiCountdown();
+      }
 
       // 更新ref
       prevGameStateRef.current = { ...newState };
@@ -71,6 +76,8 @@ const GameBoard: React.FC<GameBoardProps> = ({ difficulty = 'medium' }) => {
 
     engine.setGameEndCallback((winner, finalState) => {
       console.log('🏁 游戏结束 - 胜者:', winner);
+      // 取消倒计时
+      clearMinpaiCountdown();
       setGameState(finalState);
       showGameMessage(winner === 'human' ? '🎉 恭喜你赢了！' : '😔 AI赢了，下次加油！');
     });
@@ -83,6 +90,7 @@ const GameBoard: React.FC<GameBoardProps> = ({ difficulty = 'medium' }) => {
 
     return () => {
       engine.destroy();
+      clearMinpaiCountdown();
     };
   }, [difficulty]);
 
@@ -107,6 +115,9 @@ const GameBoard: React.FC<GameBoardProps> = ({ difficulty = 'medium' }) => {
   const handleCallMinpai = () => {
     if (!gameEngine) return;
 
+    // 清除倒计时
+    clearMinpaiCountdown();
+
     const result = gameEngine.callMinpai();
     if (!result.success && result.message) {
       showGameMessage(result.message);
@@ -127,6 +138,53 @@ const GameBoard: React.FC<GameBoardProps> = ({ difficulty = 'medium' }) => {
   // 返回首页
   const handleBack = () => {
     navigate('/home');
+  };
+
+  // 开始叫牌倒计时
+  const startMinpaiCountdown = () => {
+    // 清除之前的倒计时
+    clearMinpaiCountdown();
+
+    console.log('⏰ 开始3秒叫牌倒计时');
+    setMinpaiCountdown(3);
+
+    countdownRef.current = setInterval(() => {
+      setMinpaiCountdown(prev => {
+        if (prev === null || prev <= 1) {
+          // 倒计时结束，AI处罚玩家
+          console.log('⏰ 倒计时结束，AI处罚玩家');
+          clearMinpaiCountdown();
+
+          // AI处罚玩家 - 强制处罚
+          if (gameEngine) {
+            console.log('⚠️ 玩家未在3秒内叫牌，AI自动处罚');
+
+            // 直接调用游戏引擎的处罚方法
+            // 这里我们需要一个特殊的方法来处理AI强制处罚
+            // 由于游戏引擎中没有直接的强制处罚方法，我们通过模拟叫牌失败来处罚
+            const result = gameEngine.callMinpai();
+            if (!result.success) {
+              // 如果叫牌失败，说明AI举报成功，玩家被罚牌
+              showGameMessage('⏰ 时间到！AI举报成功，你被罚牌！');
+            }
+          }
+
+          return null;
+        }
+        console.log(`⏰ 倒计时: ${prev - 1}秒`);
+        return prev - 1;
+      });
+    }, 1000);
+  };
+
+  // 清除叫牌倒计时
+  const clearMinpaiCountdown = () => {
+    if (countdownRef.current) {
+      clearInterval(countdownRef.current);
+      countdownRef.current = null;
+    }
+    setMinpaiCountdown(null);
+    console.log('⏰ 叫牌倒计时已清除');
   };
 
   if (isLoading || !gameState) {

@@ -219,6 +219,26 @@
   font-size: 1rem;
 }
 
+.countdown-warning {
+  color: #e74c3c !important;
+  font-size: 1.2rem !important;
+  font-weight: 700 !important;
+  animation: countdown-pulse 1s infinite;
+  text-shadow: 0 0 10px rgba(231, 76, 60, 0.5);
+  margin: 10px 0 !important;
+}
+
+@keyframes countdown-pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 0.8;
+  }
+}
+
 /* 玩家区域 */
 .player-area {
   background: rgba(255, 255, 255, 0.9);
