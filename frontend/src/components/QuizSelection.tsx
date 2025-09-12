@@ -18,31 +18,31 @@ const QuizSelection: React.FC = () => {
   const cityData: CityInfo[] = [
     {
       name: '福州候官文化',
-      description: '福州传统文化的重要载体，展现闽都文化的独特魅力',
+      description: '敢为天下先，开眼看世界。',
       image: '/static/image/fuzhou.PNG',
       questionCount: 5
     },
     {
       name: '泉州海丝文化',
-      description: '古代海上丝绸之路的重要港口，多元文化交融之地',
+      description: '爱拼才会赢，潮声传五洲。',
       image: '/static/image/quanzhou.PNG',
       questionCount: 5
     },
     {
       name: '南平朱子文化',
-      description: '理学大师朱熹的故乡，儒家文化的重要传承地',
+      description: '格物致知理，继往开来魂。',
       image: '/static/image/nanping.PNG',
       questionCount: 5
     },
     {
       name: '龙岩红色文化',
-      description: '中国革命的重要策源地，红色文化的精神家园',
+      description: '星火可燎原，浩气永长存。',
       image: '/static/image/longyan.PNG',
       questionCount: 5
     },
     {
       name: '莆田妈祖文化',
-      description: '妈祖文化的发源地，海洋文化的精神象征',
+      description: '大爱通四海，慈光佑五洲。',
       image: '/static/image/putian.PNG',
       questionCount: 5
     }

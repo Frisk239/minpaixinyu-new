@@ -120,25 +120,46 @@
   position: relative;
   margin-left: auto;
   margin-right: auto;
+  background: transparent; /* 移除白色背景 */
+  box-shadow: none; /* 移除阴影 */
 }
 
 .user-message {
-  background: linear-gradient(135deg, #667eea, #764ba2);
-  color: white;
+  background: linear-gradient(135deg, #667eea, #764ba2) !important; /* 蓝紫色渐变背景 */
+  color: white !important; /* 白色字体 */
   border-bottom-right-radius: 5px;
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3); /* 恢复阴影 */
 }
 
 .assistant-message {
-  background: #f8f9fa;
-  color: #333;
+  background: linear-gradient(135deg, #f5f1e8, #e8dcc0) !important; /* 米色渐变背景 */
+  color: #333 !important; /* 深灰色字体 */
   border-bottom-left-radius: 5px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* 恢复阴影 */
 }
 
 .message-content p {
   margin: 5px 0;
   line-height: 1.6;
+}
+
+/* AI对话页面专用消息内容样式，移除背景框 */
+.ai-dialogue-container .message-content {
+  background: transparent !important; /* 移除白色背景 */
+  padding: 15px;
+  border-radius: 15px;
+  line-height: 1.6;
+  box-shadow: none !important; /* 移除阴影 */
+}
+
+/* 强制设置AI消息字体颜色 */
+.ai-dialogue-container .assistant-message .message-content {
+  color: #333 !important; /* 强制深灰色 */
+}
+
+/* 强制设置用户消息字体颜色 */
+.ai-dialogue-container .user-message .message-content {
+  color: white !important; /* 强制白色 */
 }
 
 .message-time {
