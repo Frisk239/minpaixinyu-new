@@ -159,7 +159,6 @@ const QuizResult: React.FC<QuizResultProps> = ({
       <div className="quiz-result-content">
         {/* 头部区域 */}
         <div className="result-header">
-          <button onClick={onBack} className="back-btn">← 返回</button>
           <h1>{cityName}知识问答</h1>
           <div className="result-badge">
             <span className="grade-text" style={{ color: getGradeColor() }}>

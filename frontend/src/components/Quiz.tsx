@@ -225,7 +225,6 @@ const Quiz: React.FC<QuizProps> = ({ cityName: propCityName, onComplete, onBack 
         <div className="error">
           <h3>出错了</h3>
           <p>{error}</p>
-          <button onClick={onBack} className="back-btn">返回</button>
         </div>
       </div>
     );
@@ -237,7 +236,6 @@ const Quiz: React.FC<QuizProps> = ({ cityName: propCityName, onComplete, onBack 
         <div className="no-questions">
           <h3>暂无题目</h3>
           <p>该城市的题目还未准备好，请稍后再试。</p>
-          <button onClick={onBack} className="back-btn">返回</button>
         </div>
       </div>
     );
@@ -260,7 +258,6 @@ const Quiz: React.FC<QuizProps> = ({ cityName: propCityName, onComplete, onBack 
 
       {/* 头部信息 */}
       <div className="quiz-header">
-        <button onClick={onBack} className="back-btn">← 返回</button>
         <h2>{currentCityName}知识问答</h2>
         <div className="quiz-info">
           <span>题目 {currentQuestionIndex + 1} / {questions.length}</span>

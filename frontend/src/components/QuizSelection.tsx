@@ -98,7 +98,6 @@ const QuizSelection: React.FC = () => {
 
       {/* 头部 */}
       <div className="selection-header">
-        <button onClick={handleBack} className="back-btn">← 返回首页</button>
         <h1>选择答题城市</h1>
         <p>请选择您想要测试的城市，每个城市随机抽取5道精选题目</p>
       </div>
