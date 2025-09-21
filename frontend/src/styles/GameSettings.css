@@ -325,6 +325,84 @@
   transform: translateY(-1px);
 }
 
+/* 半屏模式优化 */
+@media (max-width: 1024px) {
+  .settings-content {
+    padding: 75px 18px 35px;
+  }
+
+  .settings-header {
+    padding: 25px;
+    margin-bottom: 35px;
+  }
+
+  .settings-header h1 {
+    font-size: 2.5rem;
+  }
+
+  .settings-header p {
+    font-size: 1.1rem;
+  }
+
+  .difficulty-grid {
+    gap: 25px;
+  }
+
+  .difficulty-card {
+    padding: 25px;
+  }
+
+  .card-header h3 {
+    font-size: 1.4rem;
+  }
+
+  .card-description {
+    font-size: 0.95rem;
+    margin-bottom: 18px;
+  }
+
+  .ai-features h4 {
+    font-size: 1rem;
+  }
+
+  .ai-features li {
+    font-size: 0.9rem;
+    padding: 4px 0;
+    justify-content: center;
+    text-align: center;
+  }
+
+  .ai-features li:before {
+    margin-right: 6px;
+  }
+
+  .game-info {
+    padding: 25px;
+    margin-bottom: 35px;
+  }
+
+  .game-info h3 {
+    font-size: 1.6rem;
+  }
+
+  .rules-grid {
+    gap: 18px;
+  }
+
+  .rule-item {
+    padding: 13px;
+  }
+
+  .rule-text {
+    font-size: 0.95rem;
+  }
+
+  .start-game-btn {
+    padding: 18px 35px;
+    font-size: 1.2rem;
+  }
+}
+
 /* 响应式设计 */
 @media (max-width: 768px) {
   .settings-content {
@@ -333,10 +411,15 @@
 
   .settings-header {
     padding: 20px;
+    margin-bottom: 30px;
   }
 
   .settings-header h1 {
     font-size: 2.2rem;
+  }
+
+  .settings-header p {
+    font-size: 1rem;
   }
 
   .difficulty-grid {
@@ -354,9 +437,55 @@
     align-items: flex-start;
   }
 
+  .card-header h3 {
+    font-size: 1.3rem;
+  }
+
+  .card-description {
+    font-size: 0.9rem;
+    margin-bottom: 15px;
+  }
+
+  .ai-features h4 {
+    font-size: 0.95rem;
+  }
+
+  .ai-features li {
+    font-size: 0.85rem;
+    padding: 3px 0;
+    justify-content: center;
+    text-align: center;
+  }
+
+  .ai-features li:before {
+    margin-right: 6px;
+  }
+
+  .game-info {
+    padding: 20px;
+    margin-bottom: 30px;
+  }
+
+  .game-info h3 {
+    font-size: 1.5rem;
+  }
+
   .rules-grid {
     grid-template-columns: 1fr;
     gap: 15px;
+  }
+
+  .rule-item {
+    padding: 12px;
+  }
+
+  .rule-icon {
+    font-size: 1.3rem;
+    margin-right: 12px;
+  }
+
+  .rule-text {
+    font-size: 0.9rem;
   }
 
   .start-game-btn {

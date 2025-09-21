@@ -125,7 +125,7 @@ function App() {
   return (
     <Router>
       <div className="App">
-        {authState.isAuthenticated && <Navbar onLogout={logout} />}
+        {authState.isAuthenticated && <Navbar />}
         <Routes>
           <Route
             path="/"

@@ -140,6 +140,20 @@ const PDFReader: React.FC<PDFReaderProps> = () => {
   const [pageRange, setPageRange] = useState({ start: 1, end: 8 });
   const [isAnimating, setIsAnimating] = useState(false);
   const [animationDirection, setAnimationDirection] = useState<'left' | 'right' | null>(null);
+  const [isSinglePageMode, setIsSinglePageMode] = useState(false);
+
+  // 检测屏幕尺寸，决定是否使用单页模式
+  useEffect(() => {
+    const checkScreenSize = () => {
+      const isSmallScreen = window.innerWidth < 1025; // 小于1024px使用单页模式
+      setIsSinglePageMode(isSmallScreen);
+    };
+
+    checkScreenSize();
+    window.addEventListener('resize', checkScreenSize);
+
+    return () => window.removeEventListener('resize', checkScreenSize);
+  }, []);
 
   // 根据imageIndex设置页数范围
   useEffect(() => {
@@ -183,15 +197,24 @@ const PDFReader: React.FC<PDFReaderProps> = () => {
 
   // 计算当前显示的页面
   const getCurrentPages = () => {
-    const leftPage = pageRange.start + (currentPageSet * 2);
-    const rightPage = leftPage + 1;
-    return { leftPage, rightPage };
+    if (isSinglePageMode) {
+      // 单页模式：每次显示一页
+      const currentPage = pageRange.start + currentPageSet;
+      return { leftPage: currentPage, rightPage: null };
+    } else {
+      // 双页模式：每次显示两页
+      const leftPage = pageRange.start + (currentPageSet * 2);
+      const rightPage = leftPage + 1;
+      return { leftPage, rightPage };
+    }
   };
 
   const { leftPage, rightPage } = getCurrentPages();
 
   // 计算总的页面组数
-  const totalPageSets = Math.ceil((pageRange.end - pageRange.start + 1) / 2);
+  const totalPageSets = isSinglePageMode
+    ? (pageRange.end - pageRange.start + 1) // 单页模式：总页数
+    : Math.ceil((pageRange.end - pageRange.start + 1) / 2); // 双页模式：总组数
 
   const handlePrevPage = () => {
     if (currentPageSet > 0 && !isAnimating) {
@@ -201,7 +224,7 @@ const PDFReader: React.FC<PDFReaderProps> = () => {
         setCurrentPageSet(prev => prev - 1);
         setIsAnimating(false);
         setAnimationDirection(null);
-      }, 600);
+      }, isSinglePageMode ? 400 : 600);
     }
   };
 
@@ -213,7 +236,7 @@ const PDFReader: React.FC<PDFReaderProps> = () => {
         setCurrentPageSet(prev => prev + 1);
         setIsAnimating(false);
         setAnimationDirection(null);
-      }, 600);
+      }, isSinglePageMode ? 400 : 600);
     }
   };
 
@@ -223,7 +246,7 @@ const PDFReader: React.FC<PDFReaderProps> = () => {
 
   // 判断是否需要显示空白页面
   const shouldShowBlankPage = () => {
-    return rightPage > pageRange.end;
+    return !isSinglePageMode && rightPage && rightPage > pageRange.end;
   };
 
   return (
@@ -246,31 +269,44 @@ const PDFReader: React.FC<PDFReaderProps> = () => {
 
         {/* PDF显示区域 */}
         <div className="pdf-display">
-          <div className={`pdf-pages ${isAnimating ? 'animating' : ''} ${animationDirection ? `flip-${animationDirection}` : ''}`}>
-            {/* 左侧页面 */}
-            <div className="pdf-page left-page">
-              <PDFPage
-                pageNumber={leftPage}
-                pdfUrl="/static/text.pdf"
-              />
-            </div>
-
-            {/* 右侧页面 */}
-            <div className="pdf-page right-page">
-              {!shouldShowBlankPage() ? (
+          {isSinglePageMode ? (
+            // 单页模式
+            <div className={`pdf-single-page ${isAnimating ? 'animating' : ''} ${animationDirection ? `flip-${animationDirection}` : ''}`}>
+              <div className="pdf-page single-page">
                 <PDFPage
-                  pageNumber={rightPage}
+                  pageNumber={leftPage}
                   pdfUrl="/static/text.pdf"
                 />
-              ) : (
-                <div className="blank-page">
-                  <div className="blank-content">
-                    <span>空白页</span>
-                  </div>
-                </div>
-              )}
+              </div>
             </div>
-          </div>
+          ) : (
+            // 双页模式
+            <div className={`pdf-pages ${isAnimating ? 'animating' : ''} ${animationDirection ? `flip-${animationDirection}` : ''}`}>
+              {/* 左侧页面 */}
+              <div className="pdf-page left-page">
+                <PDFPage
+                  pageNumber={leftPage}
+                  pdfUrl="/static/text.pdf"
+                />
+              </div>
+
+              {/* 右侧页面 */}
+              <div className="pdf-page right-page">
+                {!shouldShowBlankPage() ? (
+                  <PDFPage
+                    pageNumber={rightPage!}
+                    pdfUrl="/static/text.pdf"
+                  />
+                ) : (
+                  <div className="blank-page">
+                    <div className="blank-content">
+                      <span>空白页</span>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
         </div>
 
         {/* 控制按钮 */}
@@ -284,9 +320,19 @@ const PDFReader: React.FC<PDFReaderProps> = () => {
           </button>
 
           <div className="page-info">
-            <span>第 {leftPage}{!shouldShowBlankPage() ? `-${rightPage}` : ''} 页</span>
-            <br />
-            <small>第 {currentPageSet + 1} / {totalPageSets} 组 · 总范围: {pageRange.start}-{pageRange.end} 页</small>
+            {isSinglePageMode ? (
+              <>
+                <span>第 {leftPage} 页</span>
+                <br />
+                <small>范围: {pageRange.start}-{pageRange.end} 页</small>
+              </>
+            ) : (
+              <>
+                <span>第 {leftPage}{!shouldShowBlankPage() ? `-${rightPage}` : ''} 页</span>
+                <br />
+                <small>第 {currentPageSet + 1} / {totalPageSets} 组 · 总范围: {pageRange.start}-{pageRange.end} 页</small>
+              </>
+            )}
           </div>
 
           <button

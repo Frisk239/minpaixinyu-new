@@ -1,16 +1,16 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import '../styles/Navbar.css';
 
-interface NavbarProps {
-  onLogout: () => void;
-}
+const Navbar: React.FC = () => {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-const Navbar: React.FC<NavbarProps> = ({ onLogout }) => {
-  const handleLogout = () => {
-    if (window.confirm('确定要退出登录吗？')) {
-      onLogout();
-    }
+  const toggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen);
+  };
+
+  const closeMenu = () => {
+    setIsMenuOpen(false);
   };
 
   return (
@@ -25,16 +25,30 @@ const Navbar: React.FC<NavbarProps> = ({ onLogout }) => {
           />
         </div>
 
+        {/* 汉堡菜单按钮 - 只在移动端显示 */}
+        <button
+          className={`hamburger-menu ${isMenuOpen ? 'open' : ''}`}
+          onClick={toggleMenu}
+          aria-label="切换菜单"
+        >
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+
         {/* 导航链接 */}
-        <div className="navbar-links">
-          <Link to="/home" className="nav-link">文化云游</Link>
-          <Link to="/ai-dialogue" className="nav-link">AI对话</Link>
-          <Link to="/audio-book" className="nav-link">有声读物</Link>
-          <Link to="/card-game" className="nav-link">线上桌游</Link>
-          <Link to="/quiz" className="nav-link">互动答题</Link>
-          <Link to="/profile" className="nav-link">个人中心</Link>
+        <div className={`navbar-links ${isMenuOpen ? 'open' : ''}`}>
+          <Link to="/home" className="nav-link" onClick={closeMenu}>文化云游</Link>
+          <Link to="/ai-dialogue" className="nav-link" onClick={closeMenu}>AI对话</Link>
+          <Link to="/audio-book" className="nav-link" onClick={closeMenu}>有声读物</Link>
+          <Link to="/card-game" className="nav-link" onClick={closeMenu}>线上桌游</Link>
+          <Link to="/quiz" className="nav-link" onClick={closeMenu}>互动答题</Link>
+          <Link to="/profile" className="nav-link" onClick={closeMenu}>个人中心</Link>
         </div>
       </div>
+
+      {/* 移动端菜单遮罩 */}
+      {isMenuOpen && <div className="menu-overlay" onClick={closeMenu}></div>}
     </nav>
   );
 };

@@ -318,6 +318,8 @@
   box-shadow: 0 12px 30px rgba(39, 174, 96, 0.3);
 }
 
+
+
 .card-header {
   display: flex;
   justify-content: space-between;
@@ -548,77 +550,5 @@
   100% {
     transform: translate(-50%, -50%) scale(1);
     opacity: 1;
-  }
-}
-
-/* 响应式设计 */
-@media (max-width: 768px) {
-  .game-header {
-    flex-direction: column;
-    gap: 15px;
-    padding: 15px 20px;
-  }
-
-  .game-header h1 {
-    font-size: 2rem;
-  }
-
-  .game-info {
-    flex-direction: column;
-    gap: 10px;
-  }
-
-  .game-main {
-    padding: 70px 15px 30px; /* 移动端为导航栏留出空间 */
-    gap: 20px;
-  }
-
-  .game-center {
-    padding: 20px;
-  }
-
-  .player-hand {
-    gap: 8px;
-    max-width: 100%;
-  }
-
-  .card-display {
-    width: 80px;
-    height: 120px;
-  }
-
-  .game-stats {
-    grid-template-columns: 1fr;
-    gap: 15px;
-    padding: 15px;
-  }
-
-  .stat-value {
-    font-size: 1.2rem;
-  }
-}
-
-@media (max-width: 480px) {
-  .game-header {
-    padding: 10px 15px;
-  }
-
-  .game-header h1 {
-    font-size: 1.8rem;
-  }
-
-  .game-main {
-    padding: 15px 10px;
-  }
-
-  .card-display {
-    width: 70px;
-    height: 105px;
-  }
-
-  .control-btn {
-    padding: 12px 25px;
-    font-size: 1rem;
-    min-width: 180px;
   }
 }

@@ -16,6 +16,7 @@
   justify-content: space-between;
   max-width: 1200px;
   margin: 0 auto;
+  position: relative;
 }
 
 /* Logo */
@@ -55,26 +56,58 @@
   background-color: rgba(139, 69, 19, 0.1);
 }
 
-/* 导航栏右侧操作 */
-.navbar-actions {
-  flex-shrink: 0;
-}
+/* 导航栏右侧操作 - 已移除 */
 
-.logout-btn {
-  background-color: #8B4513;
-  color: white;
+/* 汉堡菜单按钮 */
+.hamburger-menu {
+  display: none;
+  flex-direction: column;
+  justify-content: space-around;
+  width: 30px;
+  height: 30px;
+  background: transparent;
   border: none;
-  padding: 8px 16px;
-  border-radius: 5px;
-  font-size: 14px;
   cursor: pointer;
-  transition: background-color 0.3s, transform 0.2s;
-  font-family: 'FangZhengFengYaKaiSong', serif;
+  padding: 0;
+  z-index: 1001;
 }
 
-.logout-btn:hover {
-  background-color: #654321;
-  transform: translateY(-1px);
+.hamburger-menu span {
+  width: 30px;
+  height: 3px;
+  background: #333;
+  border-radius: 2px;
+  transition: all 0.3s ease;
+  transform-origin: center;
+}
+
+.hamburger-menu.open span:nth-child(1) {
+  transform: rotate(45deg) translate(6px, 6px);
+}
+
+.hamburger-menu.open span:nth-child(2) {
+  opacity: 0;
+}
+
+.hamburger-menu.open span:nth-child(3) {
+  transform: rotate(-45deg) translate(6px, -6px);
+}
+
+/* 移动端菜单遮罩 */
+.menu-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+}
+
+/* 移动端菜单样式 */
+.navbar-links.open {
+  transform: translateX(0);
 }
 
 /* 响应式设计 */
@@ -91,23 +124,46 @@
 
 @media (max-width: 768px) {
   .navbar-container {
-    flex-direction: column;
-    gap: 10px;
-  }
-
-  .navbar-links {
-    order: 2;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 15px;
-  }
-
-  .navbar-actions {
-    order: 3;
+    position: relative;
   }
 
   .navbar-logo {
-    order: 1;
+    margin-right: auto;
+  }
+
+  /* 显示汉堡菜单 */
+  .hamburger-menu {
+    display: flex;
+  }
+
+  /* 隐藏桌面端导航链接 */
+  .navbar-links {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 280px;
+    height: 100vh;
+    background: rgba(255, 235, 205, 0.95);
+    backdrop-filter: blur(20px);
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    padding: 80px 30px 30px;
+    gap: 25px;
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+    z-index: 1000;
+    box-shadow: -5px 0 25px rgba(0, 0, 0, 0.2);
+  }
+
+  /* 显示移动端菜单遮罩 */
+  .menu-overlay {
+    display: block;
+  }
+
+  /* 隐藏桌面端退出按钮 */
+  .navbar-actions {
+    display: none;
   }
 
   .logo-img {
@@ -116,13 +172,17 @@
   }
 
   .nav-link {
-    font-size: 13px;
-    padding: 3px 6px;
+    font-size: 16px;
+    padding: 12px 20px;
+    width: 100%;
+    text-align: center;
+    border-radius: 8px;
+    transition: all 0.3s ease;
   }
 
-  .logout-btn {
-    font-size: 13px;
-    padding: 6px 12px;
+  .nav-link:hover {
+    background: rgba(139, 69, 19, 0.1);
+    transform: translateY(-2px);
   }
 }
 
@@ -131,17 +191,24 @@
     padding: 8px 15px;
   }
 
+  .hamburger-menu {
+    width: 25px;
+    height: 25px;
+  }
+
+  .hamburger-menu span {
+    width: 25px;
+    height: 2px;
+  }
+
   .navbar-links {
-    gap: 10px;
+    width: 250px;
+    padding: 70px 20px 20px;
+    gap: 20px;
   }
 
   .nav-link {
-    font-size: 12px;
-    padding: 2px 4px;
-  }
-
-  .logout-btn {
-    font-size: 12px;
-    padding: 5px 10px;
+    font-size: 14px;
+    padding: 10px 15px;
   }
 }
