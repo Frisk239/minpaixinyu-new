@@ -254,3 +254,15 @@ backend/data/*.sqlite3
 
 # Game card images (too large for git)
 frontend/static/game-card/
+
+# Miniprogram (微信小程序)
+miniprogram/node_modules/
+miniprogram/dist/
+miniprogram/.DS_Store
+miniprogram/*.log
+miniprogram/.vscode/
+miniprogram/.idea/
+miniprogram/*.tmp
+miniprogram/*.temp
+miniprogram/package-lock.json
+miniprogram/yarn.lock
