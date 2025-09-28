@@ -1,9 +1,11 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useResponsiveImage } from '../utils/useResponsiveImage';
 import '../styles/Entrance.css';
 
 const Entrance: React.FC = () => {
   const navigate = useNavigate();
+  const backgroundImage = useResponsiveImage('entrance');
 
   const handleClick = (event: React.MouseEvent<HTMLDivElement>) => {
     const rect = event.currentTarget.getBoundingClientRect();
@@ -20,7 +22,7 @@ const Entrance: React.FC = () => {
     <div className="entrance-container" onClick={handleClick}>
       <div className="entrance-image fade-in">
         <img
-          src="/static/image/entrance.png"
+          src={backgroundImage}
           alt="进入页面"
           className="entrance-background-img"
         />

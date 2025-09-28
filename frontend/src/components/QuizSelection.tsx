@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useResponsiveImage } from '../utils/useResponsiveImage';
 import '../styles/QuizSelection.css';
 
 interface CityInfo {
@@ -11,6 +12,7 @@ interface CityInfo {
 
 const QuizSelection: React.FC = () => {
   const navigate = useNavigate();
+  const backgroundImage = useResponsiveImage('index');
   const [cities, setCities] = useState<CityInfo[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -54,7 +56,7 @@ const QuizSelection: React.FC = () => {
       setCities(cityData);
       setLoading(false);
     }, 500);
-  }, []);
+  }, [cityData]);
 
   const handleCitySelect = (cityName: string) => {
     // 将城市名称转换为对应的英文标识
@@ -70,9 +72,7 @@ const QuizSelection: React.FC = () => {
     navigate(`/quiz/${cityKey}`);
   };
 
-  const handleBack = () => {
-    navigate('/home');
-  };
+
 
   if (loading) {
     return (
@@ -90,7 +90,7 @@ const QuizSelection: React.FC = () => {
       {/* 背景图片 */}
       <div className="quiz-selection-background">
         <img
-          src="/static/image/index.png"
+          src={backgroundImage}
           alt="背景图片"
           className="quiz-selection-background-img"
         />

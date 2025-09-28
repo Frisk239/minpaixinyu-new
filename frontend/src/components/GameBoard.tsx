@@ -5,6 +5,7 @@ import { HTML5Backend } from 'react-dnd-html5-backend';
 import { GameEngine, createGameEngine } from '../utils/gameEngine';
 import { Card, GameState } from '../utils/gameTypes';
 import { CULTURE_COLORS, CULTURE_NAMES, CARD_TYPE_NAMES } from '../utils/gameTypes';
+import { useResponsiveImage } from '../utils/useResponsiveImage';
 import GameSettings from './GameSettings';
 import '../styles/GameBoard.css';
 
@@ -14,6 +15,7 @@ interface GameBoardProps {
 
 const GameBoard: React.FC<GameBoardProps> = ({ difficulty = 'medium' }) => {
   const navigate = useNavigate();
+  const backgroundImage = useResponsiveImage('index');
   const [gameState, setGameState] = useState<GameState | null>(null);
   const [gameEngine, setGameEngine] = useState<GameEngine | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -344,7 +346,7 @@ const GameBoard: React.FC<GameBoardProps> = ({ difficulty = 'medium' }) => {
         {/* 背景 */}
         <div className="game-background">
           <img
-            src="/static/image/index.png"
+            src={backgroundImage}
             alt="游戏背景"
             className="game-bg-image"
           />

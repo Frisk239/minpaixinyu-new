@@ -1,12 +1,16 @@
 export default defineAppConfig({
   pages: [
-    'pages/index/index',
-    'pages/login/login'
+    'pages/index/index'
   ],
   window: {
     backgroundTextStyle: 'light',
-    navigationBarBackgroundColor: '#007aff',
     navigationBarTitleText: '闽派新语',
-    navigationBarTextStyle: 'white'
+    navigationBarBackgroundColor: '#fff',
+    navigationBarTextStyle: 'black'
+  },
+  permission: {
+    'scope.userLocation': {
+      desc: '您的位置信息将用于小程序位置接口的效果展示'
+    }
   }
 })

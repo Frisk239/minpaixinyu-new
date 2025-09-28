@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import Map from './Map';
+import { useResponsiveImage } from '../utils/useResponsiveImage';
 import '../styles/Home.css';
 
 interface User {
@@ -15,12 +16,14 @@ interface HomeProps {
 }
 
 const Home: React.FC<HomeProps> = ({ user }) => {
+  const backgroundImage = useResponsiveImage('index');
+
   return (
     <div className="home-container">
       {/* 背景图片 */}
       <div className="home-background">
         <img
-          src="/static/image/index.png"
+          src={backgroundImage}
           alt="首页背景"
           className="home-background-img"
         />

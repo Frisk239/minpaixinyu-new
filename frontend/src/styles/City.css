@@ -634,6 +634,21 @@
     font-size: 0.85rem;
   }
 
+  /* 移动端城市图片容器优化 */
+  .city-image-container {
+    min-height: 300px;
+    height: auto;
+    max-height: none;
+    padding: 5px;
+  }
+
+  .city-image {
+    width: 100%;
+    height: auto;
+    max-width: 100%;
+    object-fit: contain;
+  }
+
   /* 移动端按钮排列 */
   .action-buttons-row {
     flex-direction: column;

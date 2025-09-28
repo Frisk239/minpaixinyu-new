@@ -1,25 +1,32 @@
-import { View, Text, Button } from '@tarojs/components'
+import { View, WebView } from '@tarojs/components'
 import Taro, { useLoad } from '@tarojs/taro'
 import './index.scss'
 
 export default function Index () {
   useLoad(() => {
-    console.log('闽派新语小程序首页加载完成')
+    console.log('闽派新语小程序加载完成')
   })
 
-  const handleEnter = () => {
-    Taro.navigateTo({ url: '/pages/login/login' })
+  const handleMessage = (e) => {
+    console.log('收到web-view消息:', e.detail)
+  }
+
+  const handleLoad = () => {
+    console.log('web-view加载完成')
+  }
+
+  const handleError = (e) => {
+    console.log('web-view加载失败:', e.detail)
   }
 
   return (
     <View className='index'>
-      <Text className='title'>🏛️ 闽派新语</Text>
-      <Text className='subtitle'>福建文化学习平台</Text>
-      <Text className='description'>传承福建传统文化，开启智慧学习之旅</Text>
-      <Text className='status'>小程序初始化成功！</Text>
-      <Button className='enter-btn' onClick={handleEnter}>
-        开始学习之旅
-      </Button>
+      <WebView
+        src='http://43.142.143.15/'
+        onMessage={handleMessage}
+        onLoad={handleLoad}
+        onError={handleError}
+      />
     </View>
   )
 }

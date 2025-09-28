@@ -462,6 +462,7 @@ form {
 
   .action-buttons {
     gap: 12px;
+    align-items: center;
   }
 
   .action-btn {

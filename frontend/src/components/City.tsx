@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import WordReader from './WordReader';
+import { useResponsiveImage } from '../utils/useResponsiveImage';
 import '../styles/City.css';
 
 interface CityExploration {
@@ -30,6 +31,7 @@ type ActiveTab = 'map' | 'overview' | 'experts' | 'youth';
 const City: React.FC = () => {
   const { cityName } = useParams<{ cityName: string }>();
   const navigate = useNavigate();
+  const backgroundImage = useResponsiveImage('index');
   const [cityExploration, setCityExploration] = useState<CityExploration | null>(null);
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState(false);
@@ -255,7 +257,7 @@ const City: React.FC = () => {
       {/* 背景图片 */}
       <div className="city-background">
         <img
-          src="/static/image/index.png"
+          src={backgroundImage}
           alt="背景图片"
           className="city-background-img"
         />

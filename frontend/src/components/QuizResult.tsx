@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useResponsiveImage } from '../utils/useResponsiveImage';
 import '../styles/QuizResult.css';
 
 interface QuizResultData {
@@ -37,6 +38,7 @@ const QuizResult: React.FC<QuizResultProps> = ({
 }) => {
   const { cityName: paramCityName } = useParams<{ cityName: string }>();
   const navigate = useNavigate();
+  const backgroundImage = useResponsiveImage('index');
   const [quizData, setQuizData] = useState<QuizResultData | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -149,7 +151,7 @@ const QuizResult: React.FC<QuizResultProps> = ({
       {/* 背景图片 */}
       <div className="quiz-background">
         <img
-          src="/static/image/index.png"
+          src={backgroundImage}
           alt="背景图片"
           className="quiz-result-background-img"
         />

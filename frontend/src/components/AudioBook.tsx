@@ -1,9 +1,11 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useResponsiveImage } from '../utils/useResponsiveImage';
 import '../styles/AudioBook.css';
 
 const AudioBook: React.FC = () => {
   const navigate = useNavigate();
+  const backgroundImage = useResponsiveImage('index');
 
   const handleImageClick = (imageIndex: number) => {
     navigate(`/pdf-reader/${imageIndex}`);
@@ -14,7 +16,7 @@ const AudioBook: React.FC = () => {
       {/* 背景图片 */}
       <div className="audio-book-background">
         <img
-          src="/static/image/index.png"
+          src={backgroundImage}
           alt="有声读物背景"
           className="background-img"
         />

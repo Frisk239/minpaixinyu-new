@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import * as pdfjsLib from 'pdfjs-dist';
+import { useResponsiveImage } from '../utils/useResponsiveImage';
 import '../styles/PDFReader.css';
 
 // 配置PDF.js worker - 使用本地文件
@@ -136,6 +137,7 @@ const PDFPage: React.FC<PDFPageProps> = ({ pageNumber, pdfUrl }) => {
 const PDFReader: React.FC<PDFReaderProps> = () => {
   const { imageIndex } = useParams<{ imageIndex: string }>();
   const navigate = useNavigate();
+  const backgroundImage = useResponsiveImage('index');
   const [currentPageSet, setCurrentPageSet] = useState<number>(0);
   const [pageRange, setPageRange] = useState({ start: 1, end: 8 });
   const [isAnimating, setIsAnimating] = useState(false);
@@ -254,7 +256,7 @@ const PDFReader: React.FC<PDFReaderProps> = () => {
       {/* 背景图片 */}
       <div className="pdf-reader-background">
         <img
-          src="/static/image/index.png"
+          src={backgroundImage}
           alt="PDF阅读器背景"
           className="pdf-background-img"
         />

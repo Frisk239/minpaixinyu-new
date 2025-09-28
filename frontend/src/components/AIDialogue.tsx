@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import axios from 'axios';
+import { useResponsiveImage } from '../utils/useResponsiveImage';
 import '../styles/AIDialogue.css';
 
 interface Message {
@@ -14,6 +15,7 @@ const AIDialogue: React.FC = () => {
   const [inputMessage, setInputMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const backgroundImage = useResponsiveImage('index');
 
   // 常见问题
   const commonQuestions = [
@@ -106,7 +108,7 @@ Hello～ 我是你们的闽派文化小伙伴「闽仔」！🔥
       {/* 背景图片 */}
       <div className="ai-background">
         <img
-          src="/static/image/index.png"
+          src={backgroundImage}
           alt="AI对话背景"
           className="ai-background-img"
         />

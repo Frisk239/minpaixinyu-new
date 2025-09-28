@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useResponsiveImage } from '../utils/useResponsiveImage';
 import '../styles/Quiz.css';
 
 interface Question {
@@ -32,6 +33,7 @@ interface QuizProps {
 const Quiz: React.FC<QuizProps> = ({ cityName: propCityName, onComplete, onBack }) => {
   const { cityName: paramCityName } = useParams<{ cityName: string }>();
   const navigate = useNavigate();
+  const backgroundImage = useResponsiveImage('index');
 
   // 将URL参数中的英文标识转换为中文城市名称
   const getCityNameFromParam = (param: string) => {
@@ -250,7 +252,7 @@ const Quiz: React.FC<QuizProps> = ({ cityName: propCityName, onComplete, onBack 
       {/* 背景图片 */}
       <div className="quiz-background">
         <img
-          src="/static/image/index.png"
+          src={backgroundImage}
           alt="背景图片"
           className="quiz-background-img"
         />

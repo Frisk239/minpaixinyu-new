@@ -3,15 +3,9 @@ import Taro, { useLaunch } from '@tarojs/taro'
 
 import './app.scss'
 
-// 初始化云开发
-Taro.cloud.init({
-  env: 'cloud1-9ghihm5zbb082220', // 云环境ID
-  traceUser: true
-})
-
 function App({ children }: PropsWithChildren<any>) {
   useLaunch(() => {
-    console.log('App launched.')
+    console.log('闽派新语小程序启动')
   })
 
   // children 是将要会渲染的页面

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { useResponsiveImage } from '../utils/useResponsiveImage';
 import '../styles/Profile.css';
 
 interface User {
@@ -17,6 +18,7 @@ interface ProfileProps {
 
 const Profile: React.FC<ProfileProps> = ({ user, onLogout }) => {
   const navigate = useNavigate();
+  const backgroundImage = useResponsiveImage('index');
   const [isLoading, setIsLoading] = useState(false);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -109,7 +111,7 @@ const Profile: React.FC<ProfileProps> = ({ user, onLogout }) => {
       {/* 背景图片 */}
       <div className="profile-background">
         <img
-          src="/static/image/index.png"
+          src={backgroundImage}
           alt="背景图片"
           className="profile-background-img"
         />

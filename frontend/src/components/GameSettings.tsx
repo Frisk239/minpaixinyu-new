@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useResponsiveImage } from '../utils/useResponsiveImage';
 import '../styles/GameSettings.css';
 
 interface DifficultyInfo {
@@ -16,7 +16,7 @@ interface GameSettingsProps {
 }
 
 const GameSettings: React.FC<GameSettingsProps> = ({ onStartGame }) => {
-  const navigate = useNavigate();
+  const backgroundImage = useResponsiveImage('index');
   const [selectedDifficulty, setSelectedDifficulty] = useState<'easy' | 'medium' | 'hard'>('medium');
 
   const difficulties: DifficultyInfo[] = [
@@ -65,16 +65,12 @@ const GameSettings: React.FC<GameSettingsProps> = ({ onStartGame }) => {
     onStartGame(selectedDifficulty);
   };
 
-  const handleBack = () => {
-    navigate('/home');
-  };
-
   return (
     <div className="game-settings">
       {/* 背景 */}
       <div className="settings-background">
         <img
-          src="/static/image/index.png"
+          src={backgroundImage}
           alt="设置背景"
           className="settings-bg-image"
         />
@@ -84,7 +80,6 @@ const GameSettings: React.FC<GameSettingsProps> = ({ onStartGame }) => {
       <div className="settings-content">
         {/* 头部 */}
         <div className="settings-header">
-          <button onClick={handleBack} className="back-btn">← 返回首页</button>
           <h1>🎴 《一起闽派！》</h1>
           <p>选择AI难度，开始您的卡牌对战之旅</p>
         </div>
