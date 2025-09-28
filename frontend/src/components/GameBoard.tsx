@@ -1,7 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { DndProvider } from 'react-dnd';
-import { HTML5Backend } from 'react-dnd-html5-backend';
 import { GameEngine, createGameEngine } from '../utils/gameEngine';
 import { Card, GameState } from '../utils/gameTypes';
 import { CULTURE_COLORS, CULTURE_NAMES, CARD_TYPE_NAMES } from '../utils/gameTypes';
@@ -341,8 +339,7 @@ const GameBoard: React.FC<GameBoardProps> = ({ difficulty = 'medium' }) => {
   const canCallMinpai = gameState.playerHand.length === 1 && gameState.currentPlayer === 'human';
 
   return (
-    <DndProvider backend={HTML5Backend}>
-      <div className="game-board">
+    <div className="game-board">
         {/* 背景 */}
         <div className="game-background">
           <img
@@ -483,7 +480,6 @@ const GameBoard: React.FC<GameBoardProps> = ({ difficulty = 'medium' }) => {
           </div>
         )}
       </div>
-    </DndProvider>
   );
 };
 
@@ -540,7 +536,6 @@ const DraggableCard: React.FC<DraggableCardProps> = ({ card, index, isPlayable, 
       className={`player-card ${isPlayable ? 'playable' : 'unplayable'}`}
       onClick={handleClick}
       style={{
-        transform: `translateX(${index * -20}px)`,
         zIndex: index
       }}
     >
