@@ -351,7 +351,7 @@ const City: React.FC = () => {
             <div className="content-section">
               <div className="city-image-container">
                 <img
-                  src={`/static/${cityKey}/${cityKey}.PNG`}
+                  src={`/static/${cityKey}/${cityKey}.png`}
                   alt={`${decodedCityName}文化地点分布`}
                   className="city-image"
                   onError={(e) => {

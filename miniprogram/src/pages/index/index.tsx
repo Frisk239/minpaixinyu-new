@@ -22,7 +22,7 @@ export default function Index () {
   return (
     <View className='index'>
       <WebView
-        src='http://43.142.143.15/'
+        src='https://frisk239.xyz/'
         onMessage={handleMessage}
         onLoad={handleLoad}
         onError={handleError}
