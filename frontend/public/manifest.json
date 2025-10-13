@@ -1,6 +1,6 @@
 {
-  "short_name": "闽派新语",
-  "name": "闽派新语 - 文化学习平台",
+  "short_name": "闽派数语",
+  "name": "闽派数语 - 文化学习平台",
   "icons": [
     {
       "src": "http://localhost:5000/static/image/logo.png",

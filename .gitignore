@@ -266,3 +266,13 @@ miniprogram/*.tmp
 miniprogram/*.temp
 miniprogram/package-lock.json
 miniprogram/yarn.lock
+
+# Flask session files
+backend/flask_session/
+
+# AI model directories
+GPT_SoVITS/
+GPT_weights_v2Pro/
+GPT-Sovits-slice/
+openai-whisper-large-v3/
+SoVITS_weights_v2Pro/

@@ -88,7 +88,12 @@ const Quiz: React.FC<QuizProps> = ({ cityName: propCityName, onComplete, onBack 
 
       setQuestions(selectedQuestions);
       setAnswers(new Array(selectedQuestions.length).fill(''));
-      setQuizResults(new Array(selectedQuestions.length).fill(null));
+      setQuizResults([]);
+      console.log('🎯 [初始化] 题目加载完成:', {
+        totalQuestions: selectedQuestions.length,
+        answersLength: selectedQuestions.length,
+        quizResultsLength: 0
+      });
     } catch (err) {
       console.error('获取题目错误:', err);
       setError(err instanceof Error ? err.message : '获取题目失败');
@@ -126,8 +131,12 @@ const Quiz: React.FC<QuizProps> = ({ cityName: propCityName, onComplete, onBack 
       newAnswers[currentQuestionIndex] = answer;
       setAnswers(newAnswers);
 
-      // 更新结果数组
+      // 更新结果数组 - 确保数组长度与题目数量一致
       const newResults = [...quizResults];
+      // 确保数组有足够的长度，至少等于题目总数
+      while (newResults.length < questions.length) {
+        newResults.push(null as any);
+      }
       newResults[currentQuestionIndex] = {
         questionId: questions[currentQuestionIndex].id,
         userAnswer: answer,
@@ -136,6 +145,15 @@ const Quiz: React.FC<QuizProps> = ({ cityName: propCityName, onComplete, onBack 
         questionText: questions[currentQuestionIndex].question_text
       };
       setQuizResults(newResults);
+
+      console.log(`✅ [答案验证] 第${currentQuestionIndex + 1}题验证完成:`, {
+        questionId: questions[currentQuestionIndex].id,
+        userAnswer: answer,
+        correctAnswer: result.correct_answer,
+        isCorrect: correct,
+        quizResultsLength: newResults.length,
+        validResultsCount: newResults.filter(r => r && r.isCorrect === true).length
+      });
 
       // 显示反馈
       setIsCorrect(correct);
@@ -181,9 +199,23 @@ const Quiz: React.FC<QuizProps> = ({ cityName: propCityName, onComplete, onBack 
   };
 
   const finishQuiz = () => {
-    // 计算最终得分
-    const correctCount = quizResults.filter(result => result?.isCorrect).length;
+    // 计算最终得分 - 确保只统计有效的结果
+    const validResults = quizResults.filter(result => result && typeof result.isCorrect === 'boolean');
+    const correctCount = validResults.filter(result => result.isCorrect).length;
     const totalQuestions = questions.length;
+
+    console.log('🏁 [完成答题] 最终得分计算:', {
+      totalQuestions,
+      quizResultsLength: quizResults.length,
+      validResultsCount: validResults.length,
+      correctCount,
+      quizResults: quizResults.map((r, i) => ({
+        index: i,
+        isCorrect: r?.isCorrect,
+        userAnswer: r?.userAnswer,
+        correctAnswer: r?.correctAnswer
+      }))
+    });
 
     // 保存到localStorage
     const quizData = {

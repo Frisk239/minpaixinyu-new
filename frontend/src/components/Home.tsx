@@ -32,7 +32,7 @@ const Home: React.FC<HomeProps> = ({ user }) => {
       {/* 内容区域 */}
       <div className="home-content">
         <div className="welcome-section">
-          <h1>欢迎来到闽派新语</h1>
+          <h1>欢迎来到闽派数语</h1>
           {user && (
             <p className="welcome-user">
               您好，{user.username}！欢迎体验我们的文化学习平台。
