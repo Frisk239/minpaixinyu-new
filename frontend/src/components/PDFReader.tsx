@@ -4,6 +4,66 @@ import * as pdfjsLib from 'pdfjs-dist';
 import { useResponsiveImage } from '../utils/useResponsiveImage';
 import '../styles/PDFReader.css';
 
+// 音频播放组件
+const AudioPlayer: React.FC<{ pageNumber: number }> = ({ pageNumber }) => {
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [audioExists, setAudioExists] = useState(false);
+  const audioRef = useRef<HTMLAudioElement>(null);
+
+  useEffect(() => {
+    // 检查音频文件是否存在
+    const checkAudioExists = async () => {
+      try {
+        const response = await fetch(`/static/voice/${pageNumber}.m4a`, { method: 'HEAD' });
+        setAudioExists(response.ok);
+      } catch (error) {
+        setAudioExists(false);
+      }
+    };
+
+    checkAudioExists();
+  }, [pageNumber]);
+
+  const toggleAudio = () => {
+    if (!audioRef.current) return;
+
+    if (isPlaying) {
+      audioRef.current.pause();
+      setIsPlaying(false);
+    } else {
+      audioRef.current.play();
+      setIsPlaying(true);
+    }
+  };
+
+  const handleAudioEnded = () => {
+    setIsPlaying(false);
+  };
+
+  // 如果音频文件不存在，不显示按钮
+  if (!audioExists) {
+    return null;
+  }
+
+  return (
+    <div className="audio-player-container">
+      <button
+        className={`audio-play-btn ${isPlaying ? 'playing' : ''}`}
+        onClick={toggleAudio}
+        title={`播放第${pageNumber}页音频`}
+      >
+        <span className="speaker-icon">🔊</span>
+      </button>
+      <audio
+        ref={audioRef}
+        src={`/static/voice/${pageNumber}.m4a`}
+        onEnded={handleAudioEnded}
+        preload="none"
+      />
+    </div>
+  );
+};
+
 // 配置PDF.js worker - 使用本地文件
 pdfjsLib.GlobalWorkerOptions.workerSrc = '/pdfjs/pdf.worker.min.js';
 
@@ -130,6 +190,8 @@ const PDFPage: React.FC<PDFPageProps> = ({ pageNumber, pdfUrl }) => {
         className="pdf-canvas"
         style={{ display: loading ? 'none' : 'block' }}
       />
+      {/* 音频播放按钮 */}
+      <AudioPlayer pageNumber={pageNumber} />
     </div>
   );
 };
