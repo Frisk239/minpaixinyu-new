@@ -486,7 +486,7 @@
 /* 响应式设计 */
 @media (max-width: 768px) {
   .quiz-container {
-    padding: 15px;
+    padding: 90px 15px 15px 15px;
   }
 
   .quiz-header {

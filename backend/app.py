@@ -390,7 +390,7 @@ def get_questions(city_name):
             '龙岩市': 'longyan',
             '莆田市': 'putian',
             # 新增文化名称映射
-            '福州候官文化': 'fuzhou',
+            '福州侯官文化': 'fuzhou',
             '泉州海丝文化': 'quanzhou',
             '南平朱子文化': 'nanping',
             '龙岩红色文化': 'longyan',
@@ -479,7 +479,7 @@ def verify_answer(city_name, question_id):
             '龙岩市': 'longyan',
             '莆田市': 'putian',
             # 新增文化名称映射
-            '福州候官文化': 'fuzhou',
+            '福州侯官文化': 'fuzhou',
             '泉州海丝文化': 'quanzhou',
             '南平朱子文化': 'nanping',
             '龙岩红色文化': 'longyan',
@@ -548,7 +548,7 @@ def submit_quiz():
             '龙岩市': 'longyan',
             '莆田市': 'putian',
             # 新增文化名称映射
-            '福州候官文化': 'fuzhou',
+            '福州侯官文化': 'fuzhou',
             '泉州海丝文化': 'quanzhou',
             '南平朱子文化': 'nanping',
             '龙岩红色文化': 'longyan',
@@ -630,7 +630,7 @@ def get_culture_files(city_name):
             '龙岩市': 'longyan',
             '莆田市': 'putian',
             # 新增文化名称映射
-            '福州候官文化': 'fuzhou',
+            '福州侯官文化': 'fuzhou',
             '泉州海丝文化': 'quanzhou',
             '南平朱子文化': 'nanping',
             '龙岩红色文化': 'longyan',
@@ -667,7 +667,7 @@ def get_culture_file(city_name, filename):
             '龙岩市': 'longyan',
             '莆田市': 'putian',
             # 新增文化名称映射
-            '福州候官文化': 'fuzhou',
+            '福州侯官文化': 'fuzhou',
             '泉州海丝文化': 'quanzhou',
             '南平朱子文化': 'nanping',
             '龙岩红色文化': 'longyan',
@@ -701,7 +701,7 @@ def get_expert_files(city_name):
             '龙岩市': 'longyan',
             '莆田市': 'putian',
             # 新增文化名称映射
-            '福州候官文化': 'fuzhou',
+            '福州侯官文化': 'fuzhou',
             '泉州海丝文化': 'quanzhou',
             '南平朱子文化': 'nanping',
             '龙岩红色文化': 'longyan',

@@ -39,6 +39,7 @@
   font-weight: 700;
   margin-bottom: 15px;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  color: #666;
 }
 
 .selection-header p {
@@ -448,7 +449,7 @@
 
 @media (max-width: 768px) {
   .quiz-selection-container {
-    padding: 15px;
+    padding: 90px 15px 15px 15px;
   }
 
   .selection-header h1 {

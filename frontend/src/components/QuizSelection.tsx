@@ -19,7 +19,7 @@ const QuizSelection: React.FC = () => {
   // 城市信息
   const cityData: CityInfo[] = [
     {
-      name: '福州候官文化',
+      name: '福州侯官文化',
       description: '敢为天下先，开眼看世界。',
       image: '/static/image/fuzhou.PNG',
       questionCount: 5

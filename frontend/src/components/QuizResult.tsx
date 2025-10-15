@@ -45,7 +45,7 @@ const QuizResult: React.FC<QuizResultProps> = ({
   // 将URL参数中的英文标识转换为中文城市名称
   const getCityNameFromParam = (param: string) => {
     const cityMapping: { [key: string]: string } = {
-      'fuzhou': '福州候官文化',
+      'fuzhou': '福州侯官文化',
       'quanzhou': '泉州海丝文化',
       'nanping': '南平朱子文化',
       'longyan': '龙岩红色文化',
