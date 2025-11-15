@@ -9,6 +9,7 @@ import City from './components/City';
 import AIDialogue from './components/AIDialogue';
 import AudioBook from './components/AudioBook';
 import PDFReader from './components/PDFReader';
+import CityPictureBook from './components/CityPictureBook';
 import QuizSelection from './components/QuizSelection';
 import Quiz from './components/Quiz';
 import QuizResult from './components/QuizResult';
@@ -188,6 +189,14 @@ function App() {
             element={
               authState.isAuthenticated ?
                 <PDFReader /> :
+                <Navigate to="/" replace />
+            }
+          />
+          <Route
+            path="/city-picture-book/:cityName"
+            element={
+              authState.isAuthenticated ?
+                <CityPictureBook /> :
                 <Navigate to="/" replace />
             }
           />

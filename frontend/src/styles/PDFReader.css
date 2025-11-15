@@ -595,3 +595,78 @@
     font-size: 16px;
   }
 }
+
+/* ========== 城市绘本阅读器专用样式 ========== */
+
+/* 绘本阅读器标题样式 */
+.city-picture-book-title {
+  color: #8B4513;
+  text-align: center;
+  font-size: 2rem;
+  font-weight: bold;
+  font-family: 'FangZhengFengYaKaiSong', serif;
+  margin: 20px 0;
+  text-shadow: 2px 2px 4px rgba(255, 255, 255, 0.8);
+}
+
+/* 绘本阅读器样式优化 */
+.pdf-single-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 70vh;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 15px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  padding: 30px;
+  margin: 20px 0;
+}
+
+.pdf-single-page .pdf-page.single-page {
+  max-width: 100%;
+  max-height: 60vh;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.pdf-single-page .pdf-canvas {
+  max-width: 100%;
+  max-height: 60vh;
+  border-radius: 10px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* 绘本阅读器响应式设计 */
+@media (max-width: 768px) {
+  .city-picture-book-title {
+    font-size: 1.5rem;
+    margin: 15px 0;
+  }
+  
+  .pdf-single-page {
+    padding: 20px;
+    min-height: 60vh;
+  }
+  
+  .pdf-single-page .pdf-canvas {
+    max-height: 50vh;
+  }
+}
+
+@media (max-width: 480px) {
+  .city-picture-book-title {
+    font-size: 1.3rem;
+    margin: 10px 0;
+  }
+  
+  .pdf-single-page {
+    padding: 15px;
+    min-height: 50vh;
+  }
+  
+  .pdf-single-page .pdf-canvas {
+    max-height: 40vh;
+  }
+}

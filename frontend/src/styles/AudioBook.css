@@ -40,6 +40,13 @@
   margin: 0 auto;
 }
 
+/* 间隔元素 - 用于在第6个卡片后创建间隔 */
+.gap-element {
+  grid-column: 1 / -1; /* 跨越整个网格宽度 */
+  height: 50px;
+  background: transparent;
+}
+
 .passage-card {
   background: rgba(255, 255, 255, 0.9);
   backdrop-filter: blur(10px);
@@ -96,6 +103,10 @@
     grid-template-rows: repeat(3, 1fr);
     gap: 25px;
   }
+  
+  .gap-element {
+    height: 30px; /* 移动端减少间隔高度 */
+  }
 }
 
 @media (max-width: 768px) {
@@ -105,8 +116,12 @@
 
   .audio-book-grid {
     grid-template-columns: 1fr;
-    grid-template-rows: repeat(6, 1fr);
+    grid-template-rows: repeat(11, 1fr); /* 6个原始 + 1个间隔 + 4个城市 = 11 */
     gap: 20px;
+  }
+
+  .gap-element {
+    height: 20px; /* 移动端更小的间隔 */
   }
 
   .passage-card {
@@ -126,6 +141,10 @@
 
   .audio-book-grid {
     gap: 15px;
+  }
+
+  .gap-element {
+    height: 15px; /* 小屏手机最小间隔 */
   }
 
   .passage-card {
