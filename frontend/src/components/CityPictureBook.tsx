@@ -144,7 +144,7 @@ const CityPictureBook: React.FC<CityPictureBookProps> = () => {
   const [animationDirection, setAnimationDirection] = useState<'left' | 'right' | null>(null);
   const [isSinglePageMode, setIsSinglePageMode] = useState(false);
 
-  // 检测屏幕尺寸，决定是否使用单页模式
+  // 检测屏幕尺寸，决定是否使用单页模式（与PDFReader保持一致）
   useEffect(() => {
     const checkScreenSize = () => {
       const isSmallScreen = window.innerWidth < 1025; // 小于1024px使用单页模式
@@ -176,6 +176,7 @@ const CityPictureBook: React.FC<CityPictureBookProps> = () => {
     loadPDF();
   }, [cityName]);
 
+  // 使用与PDFReader完全相同的翻页逻辑
   const handlePrevPage = () => {
     if (currentPage > 1 && !isAnimating) {
       setAnimationDirection('right'); // 向右翻页动画
@@ -184,7 +185,7 @@ const CityPictureBook: React.FC<CityPictureBookProps> = () => {
         setCurrentPage(prev => prev - 1);
         setIsAnimating(false);
         setAnimationDirection(null);
-      }, 400);
+      }, isSinglePageMode ? 400 : 600); // 与PDFReader完全相同的时长
     }
   };
 
@@ -196,7 +197,7 @@ const CityPictureBook: React.FC<CityPictureBookProps> = () => {
         setCurrentPage(prev => prev + 1);
         setIsAnimating(false);
         setAnimationDirection(null);
-      }, 400);
+      }, isSinglePageMode ? 400 : 600); // 与PDFReader完全相同的时长
     }
   };
 
@@ -214,6 +215,18 @@ const CityPictureBook: React.FC<CityPictureBookProps> = () => {
       'putian': '莆田'
     };
     return cityMap[code] || code;
+  };
+
+  // 获取文化声芽标题
+  const getCultureTitle = (code: string) => {
+    const cultureTitleMap: Record<string, string> = {
+      'fuzhou': '文化声芽1：小榕树下的侯官文化',
+      'quanzhou': '文化声芽2：古代的刺桐港',
+      'nanping': '文化声芽3：小莲的朱子奇遇',
+      'longyan': '文化声芽4：红石头的小星愿',
+      'putian': '文化声芽5：闪闪湄洲湾'
+    };
+    return cultureTitleMap[code] || `${getCityDisplayName(code)}文化绘本`;
   };
 
   // PDF文件路径
@@ -239,10 +252,10 @@ const CityPictureBook: React.FC<CityPictureBookProps> = () => {
 
         {/* 标题 */}
         <h1 className="city-picture-book-title">
-          {getCityDisplayName(cityName || '')}文化绘本
+          {getCultureTitle(cityName || '')}
         </h1>
 
-        {/* PDF显示区域 */}
+        {/* PDF显示区域 - 使用与PDFReader完全相同的动画类 */}
         <div className="pdf-display">
           <div className={`pdf-single-page ${isAnimating ? 'animating' : ''} ${animationDirection ? `flip-${animationDirection}` : ''}`}>
             <div className="pdf-page single-page">
@@ -254,7 +267,7 @@ const CityPictureBook: React.FC<CityPictureBookProps> = () => {
           </div>
         </div>
 
-        {/* 控制按钮 */}
+        {/* 控制按钮区域 */}
         <div className="pdf-controls">
           <button
             className="control-btn prev-btn"

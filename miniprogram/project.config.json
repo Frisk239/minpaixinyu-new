@@ -5,10 +5,10 @@
 	"appid": "wx25d7057738ff4de5",
 	"setting": {
 		"urlCheck": false,
-		"es6": false,
-		"enhance": false,
-		"compileHotReLoad": false,
-		"postcss": false,
+		"es6": true,
+		"enhance": true,
+		"compileHotReLoad": true,
+		"postcss": true,
 		"minified": false,
 		"coverView": true,
 		"lazyloadPlaceholderEnable": false,
@@ -34,7 +34,7 @@
 		"minifyWXML": true
 	},
 	"compileType": "miniprogram",
-	"libVersion": "3.10.1",
+	"libVersion": "3.11.2",
 	"srcMiniprogramRoot": "dist/",
 	"cloudfunctionRoot": "cloudfunctions/",
 	"packOptions": {

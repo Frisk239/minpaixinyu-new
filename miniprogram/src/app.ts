@@ -1,6 +1,9 @@
 import { PropsWithChildren } from 'react'
 import Taro, { useLaunch } from '@tarojs/taro'
 
+// 首先引入AMD polyfill，确保在所有模块之前加载
+import './polyfills/amd'
+
 import './app.scss'
 
 function App({ children }: PropsWithChildren<any>) {

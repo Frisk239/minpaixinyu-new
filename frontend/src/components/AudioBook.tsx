@@ -37,6 +37,9 @@ const AudioBook: React.FC = () => {
 
       {/* 内容区域 */}
       <div className="audio-book-content">
+        {/* 学习日记标题 */}
+        <div className="category-title">《学习日记》</div>
+
         <div className="audio-book-grid">
           {/* 原始的6个有声读物卡片 */}
           {[1, 2, 3, 4, 5, 6].map((index) => (
@@ -60,11 +63,14 @@ const AudioBook: React.FC = () => {
               />
             </div>
           ))}
-          
-          {/* 间隔元素 */}
-          <div className="gap-element"></div>
-          
-          {/* 城市绘本卡片 */}
+
+        </div>
+
+        {/* 文化声芽标题 */}
+        <div className="category-title category-title-culture">《文化声芽》</div>
+
+        {/* 城市绘本卡片网格 */}
+        <div className="audio-book-grid city-grid">
           {cities.map((city) => (
             <div
               key={city.code}

@@ -40,7 +40,8 @@ Session(app)  # 初始化 Flask-Session
 cors_origins = [
     "http://localhost:3000",  # 开发环境
     "https://frp-say.com:39668",  # 生产环境
-    "https://frp-say.com"  # 备用域名
+    "https://frp-say.com",  # 备用域名
+    "https://frisk239.xyz"  # 新域名
 ]
 CORS(app, supports_credentials=True, origins=cors_origins)
 

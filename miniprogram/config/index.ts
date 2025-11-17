@@ -21,6 +21,9 @@ export default defineConfig<'webpack5'>(async (merge, { command, mode }) => {
       "@tarojs/plugin-generator"
     ],
     defineConstants: {
+      'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'development'),
+      'process.env.TARO_ENV': JSON.stringify(process.env.TARO_ENV || 'weapp'),
+      'process.env.TARO_APP_ID': JSON.stringify(process.env.TARO_APP_ID || 'wx25d7057738ff4de5')
     },
     copy: {
       patterns: [

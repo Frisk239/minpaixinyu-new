@@ -7,5 +7,9 @@ module.exports = {
       ts: true,
       compiler: 'webpack5',
     }]
+  ],
+  plugins: [
+    // 添加AMD模块支持
+    '@babel/plugin-transform-modules-amd'
   ]
 }
