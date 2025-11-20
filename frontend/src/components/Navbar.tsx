@@ -41,6 +41,7 @@ const Navbar: React.FC = () => {
           <Link to="/home" className="nav-link" onClick={closeMenu}>文化云游</Link>
           <Link to="/ai-dialogue" className="nav-link" onClick={closeMenu}>AI对话</Link>
           <Link to="/audio-book" className="nav-link" onClick={closeMenu}>有声读物</Link>
+          <Link to="/data-compilation" className="nav-link" onClick={closeMenu}>资料汇编</Link>
           <Link to="/card-game" className="nav-link" onClick={closeMenu}>线上桌游</Link>
           <Link to="/quiz" className="nav-link" onClick={closeMenu}>互动答题</Link>
           <Link to="/profile" className="nav-link" onClick={closeMenu}>个人中心</Link>

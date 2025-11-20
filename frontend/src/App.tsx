@@ -10,6 +10,7 @@ import AIDialogue from './components/AIDialogue';
 import AudioBook from './components/AudioBook';
 import PDFReader from './components/PDFReader';
 import CityPictureBook from './components/CityPictureBook';
+import DataCompilation from './components/DataCompilation';
 import QuizSelection from './components/QuizSelection';
 import Quiz from './components/Quiz';
 import QuizResult from './components/QuizResult';
@@ -197,6 +198,14 @@ function App() {
             element={
               authState.isAuthenticated ?
                 <CityPictureBook /> :
+                <Navigate to="/" replace />
+            }
+          />
+          <Route
+            path="/data-compilation"
+            element={
+              authState.isAuthenticated ?
+                <DataCompilation /> :
                 <Navigate to="/" replace />
             }
           />
