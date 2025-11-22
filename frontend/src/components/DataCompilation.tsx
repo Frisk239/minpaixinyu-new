@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useResponsiveImage } from '../utils/useResponsiveImage';
 import '../styles/DataCompilation.css';
@@ -15,23 +15,12 @@ const DataCompilation: React.FC = () => {
   const navigate = useNavigate();
   const backgroundImage = useResponsiveImage('index');
   const [selectedDocument, setSelectedDocument] = useState<DocumentItem | null>(null);
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
+  const [pdfLoading, setPdfLoading] = useState(false);
 
-  // 资料汇编文档列表
+  // 资料汇编文档列表 - 按要求顺序：朱子、候官、龙岩、泉州、莆田
   const documents: DocumentItem[] = [
-    {
-      id: 'fuzhou',
-      title: '福州侯官文化文献资料汇编',
-      cityName: 'fuzhou',
-      imagePath: '/static/data-conpilation/image/fuzhou.png',
-      pdfPath: '/static/data-conpilation/pdf/fuzhou.pdf'
-    },
-    {
-      id: 'quanzhou',
-      title: '泉州海丝文化文献资料汇编',
-      cityName: 'quanzhou',
-      imagePath: '/static/data-conpilation/image/quanzhou.png',
-      pdfPath: '/static/data-conpilation/pdf/quanzhou.pdf'
-    },
     {
       id: 'nanping',
       title: '南平朱子文化文献资料汇编',
@@ -40,11 +29,25 @@ const DataCompilation: React.FC = () => {
       pdfPath: '/static/data-conpilation/pdf/nanping.pdf'
     },
     {
+      id: 'fuzhou',
+      title: '福州侯官文化文献资料汇编',
+      cityName: 'fuzhou',
+      imagePath: '/static/data-conpilation/image/fuzhou.png',
+      pdfPath: '/static/data-conpilation/pdf/fuzhou.pdf'
+    },
+    {
       id: 'longyan',
       title: '龙岩红色文化文献资料汇编',
       cityName: 'longyan',
       imagePath: '/static/data-conpilation/image/longyan.png',
       pdfPath: '/static/data-conpilation/pdf/longyan.pdf'
+    },
+    {
+      id: 'quanzhou',
+      title: '泉州海丝文化文献资料汇编',
+      cityName: 'quanzhou',
+      imagePath: '/static/data-conpilation/image/quanzhou.png',
+      pdfPath: '/static/data-conpilation/pdf/quanzhou.pdf'
     },
     {
       id: 'putian',
@@ -55,8 +58,23 @@ const DataCompilation: React.FC = () => {
     }
   ];
 
-  const handleDocumentClick = (document: DocumentItem) => {
-    setSelectedDocument(document);
+  // 自动轮播
+  useEffect(() => {
+    if (isPaused) return;
+
+    const interval = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % documents.length);
+    }, 3000); // 每3秒切换
+
+    return () => clearInterval(interval);
+  }, [isPaused, documents.length]);
+
+  const handleSlideClick = (index: number) => {
+    setSelectedDocument(documents[index]);
+  };
+
+  const handleIndicatorClick = (index: number) => {
+    setCurrentSlide(index);
   };
 
   const handleBack = () => {
@@ -80,52 +98,78 @@ const DataCompilation: React.FC = () => {
 
       {/* 内容区域 */}
       <div className="data-compilation-content">
-        {/* 返回按钮 */}
-        <button className="back-btn" onClick={handleBack}>
-          ← {selectedDocument ? '返回资料列表' : '返回有声读物'}
-        </button>
-
         {!selectedDocument ? (
           <>
-            {/* 标题 */}
-            <div className="category-title">资料汇编</div>
+            {/* 轮播容器 */}
+            <div
+              className="carousel-container"
+              onMouseEnter={() => setIsPaused(true)}
+              onMouseLeave={() => setIsPaused(false)}
+            >
+              {/* 轮播轨道 */}
+              <div
+                className="carousel-track"
+                style={{ transform: `translateX(-${currentSlide * 100}%)` }}
+              >
+                {documents.map((doc) => (
+                  <div
+                    key={doc.id}
+                    className="carousel-slide"
+                    onClick={() => handleSlideClick(currentSlide)}
+                  >
+                    <img
+                      src={doc.imagePath}
+                      alt={doc.title}
+                      className="carousel-image"
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        target.style.display = 'none';
+                        const fallback = window.document.createElement('div');
+                        fallback.className = 'carousel-fallback';
+                        fallback.textContent = doc.title;
+                        target.parentNode?.appendChild(fallback);
+                      }}
+                    />
+                    <div className="carousel-title">{doc.title}</div>
+                  </div>
+                ))}
+              </div>
 
-            {/* 文档网格 */}
-            <div className="document-grid">
-              {documents.map((doc) => (
-                <div
-                  key={doc.id}
-                  className="document-card"
-                  onClick={() => handleDocumentClick(doc)}
-                >
-                  <img
-                    src={doc.imagePath}
-                    alt={doc.title}
-                    className="document-img"
-                    onError={(e) => {
-                      const target = e.target as HTMLImageElement;
-                      target.style.display = 'none';
-                      const fallback = window.document.createElement('div');
-                      fallback.className = 'document-fallback';
-                      fallback.textContent = doc.title;
-                      target.parentNode?.appendChild(fallback);
+              {/* 轮播指示器 */}
+              <div className="carousel-indicators">
+                {documents.map((_, index) => (
+                  <button
+                    key={index}
+                    className={`carousel-indicator ${currentSlide === index ? 'active' : ''}`}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleIndicatorClick(index);
                     }}
                   />
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
           </>
         ) : (
-          <>
+          <div className="pdf-view-container">
             {/* PDF阅读器 */}
             <div className="pdf-reader-wrapper">
               <ScrollPDFReader
                 pdfUrl={selectedDocument.pdfPath}
                 documentTitle={selectedDocument.title}
-                onBack={() => setSelectedDocument(null)}
+                onLoadingChange={setPdfLoading}
               />
             </div>
-          </>
+
+            {/* 返回按钮在外部 - 只在PDF加载完成后显示 */}
+            {!pdfLoading && (
+              <div className="pdf-external-back">
+                <button className="pdf-back-btn" onClick={() => setSelectedDocument(null)}>
+                  ← 返回资料汇编页面
+                </button>
+              </div>
+            )}
+          </div>
         )}
       </div>
     </div>
@@ -135,14 +179,21 @@ const DataCompilation: React.FC = () => {
 // 滚动式PDF阅读器组件
 interface ScrollPDFReaderProps {
   pdfUrl: string;
-  onBack: () => void;
   documentTitle: string;
+  onLoadingChange?: (loading: boolean) => void;
 }
 
-const ScrollPDFReader: React.FC<ScrollPDFReaderProps> = ({ pdfUrl, onBack, documentTitle }) => {
+const ScrollPDFReader: React.FC<ScrollPDFReaderProps> = ({ pdfUrl, documentTitle, onLoadingChange }) => {
   const [pdfPages, setPdfPages] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // 通知父组件加载状态变化
+  React.useEffect(() => {
+    if (onLoadingChange) {
+      onLoadingChange(loading);
+    }
+  }, [loading, onLoadingChange]);
 
   React.useEffect(() => {
     const loadPDF = async () => {
@@ -224,14 +275,12 @@ const ScrollPDFReader: React.FC<ScrollPDFReaderProps> = ({ pdfUrl, onBack, docum
 
   return (
     <div className="scroll-pdf-reader">
-      {/* 标题和返回按钮在同一行 */}
+      {/* 标题 */}
       <div className="pdf-header">
         <h2 className="document-title">{documentTitle}</h2>
-        <button className="pdf-back-btn" onClick={onBack}>
-          ← 返回资料汇编页面
-        </button>
       </div>
 
+      {/* PDF页面 */}
       {pdfPages.map((pageData, index) => (
         <div key={index} className="pdf-page-scroll">
           <img

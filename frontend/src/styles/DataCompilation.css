@@ -28,6 +28,10 @@
   padding: 80px 20px 40px; /* 为导航栏留出空间 */
   max-width: 1200px;
   margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - 120px);
 }
 
 /* 返回按钮 */
@@ -124,10 +128,21 @@
   padding: 20px;
 }
 
-/* PDF阅读器包装器 */
-.pdf-reader-wrapper {
+/* PDF视图容器 */
+.pdf-view-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  width: 100%;
   max-width: 1000px;
   margin: 0 auto;
+}
+
+/* PDF阅读器包装器 */
+.pdf-reader-wrapper {
+  width: 100%;
+  max-width: 900px;
 }
 
 .document-title {
@@ -148,7 +163,7 @@
   padding: 20px;
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
   border: 2px solid rgba(218, 165, 32, 0.3);
-  max-height: 85vh; /* 调整最大高度，从88vh到85vh */
+  max-height: 78vh; /* 增加3vh高度，从75vh到78vh */
   overflow-y: auto;
   max-width: 900px;
   margin: 0 auto;
@@ -174,13 +189,21 @@
   transform: translateY(-1px);
 }
 
-/* PDF标题和按钮容器 */
+/* PDF标题容器 */
 .pdf-header {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
   margin-bottom: 20px;
-  gap: 20px;
+}
+
+/* PDF外部返回按钮容器 */
+.pdf-external-back {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 20px;
+  width: 100%;
 }
 
 /* 自定义滚动条样式 */
@@ -296,7 +319,7 @@
 
   .scroll-pdf-reader {
     padding: 15px;
-    max-height: 65vh;
+    max-height: 78vh; /* 调整到与桌面端一致，78vh */
   }
 
   .pdf-page-scroll {
@@ -329,10 +352,184 @@
 
   .scroll-pdf-reader {
     padding: 10px;
-    max-height: 60vh;
+    max-height: 78vh; /* 调整到与桌面端一致，78vh */
   }
 
   .pdf-page-scroll {
     margin-bottom: 10px;
+  }
+}
+
+/* 轮播容器样式 */
+.carousel-container {
+  position: relative;
+  width: 100%;
+  max-width: 1000px;
+  margin: 0 auto;
+  overflow: hidden;
+  border-radius: 20px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  cursor: pointer;
+  border: 2px solid rgba(218, 165, 32, 0.3);
+}
+
+/* 轮播轨道 */
+.carousel-track {
+  display: flex;
+  transition: transform 0.5s ease-in-out;
+  height: 600px;
+}
+
+/* 轮播幻灯片 */
+.carousel-slide {
+  min-width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 30px;
+  position: relative;
+}
+
+/* 轮播图片 */
+.carousel-image {
+  max-width: 100%;
+  max-height: 450px;
+  object-fit: contain;
+  border-radius: 15px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+  transition: transform 0.3s ease;
+}
+
+.carousel-slide:hover .carousel-image {
+  transform: scale(1.02);
+}
+
+/* 轮播标题 */
+.carousel-title {
+  margin-top: 25px;
+  font-size: 24px;
+  font-weight: bold;
+  color: #FFD700;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  background: rgba(139, 69, 19, 0.9);
+  padding: 12px 25px;
+  border-radius: 12px;
+  border: 2px solid #8B4513;
+  font-family: 'FangZhengFengYaKaiSong', serif;
+  backdrop-filter: blur(10px);
+}
+
+/* 轮播图片加载失败时的占位符 */
+.carousel-fallback {
+  width: 400px;
+  height: 300px;
+  background: linear-gradient(135deg, #8B4513, #D2691E);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #FFD700;
+  font-size: 20px;
+  text-align: center;
+  border-radius: 15px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+  padding: 30px;
+  font-family: 'FangZhengFengYaKaiSong', serif;
+  font-weight: bold;
+}
+
+/* 轮播指示器 */
+.carousel-indicators {
+  position: absolute;
+  bottom: 25px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 15px;
+  z-index: 10;
+}
+
+.carousel-indicator {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid #FFD700;
+  background: rgba(255, 215, 0, 0.3);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.carousel-indicator:hover {
+  background: rgba(255, 215, 0, 0.7);
+  transform: scale(1.2);
+}
+
+.carousel-indicator.active {
+  background: #FFD700;
+  box-shadow: 0 0 12px #FFD700;
+}
+
+/* 轮播响应式设计 */
+@media (max-width: 768px) {
+  .carousel-track {
+    height: 500px;
+  }
+
+  .carousel-image {
+    max-height: 350px;
+  }
+
+  .carousel-title {
+    font-size: 20px;
+    padding: 10px 20px;
+  }
+
+  .carousel-fallback {
+    width: 300px;
+    height: 250px;
+    font-size: 18px;
+    padding: 20px;
+  }
+
+  .carousel-indicator {
+    width: 12px;
+    height: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .carousel-track {
+    height: 450px;
+  }
+
+  .carousel-slide {
+    padding: 20px;
+  }
+
+  .carousel-image {
+    max-height: 300px;
+  }
+
+  .carousel-title {
+    font-size: 18px;
+    padding: 8px 16px;
+    margin-top: 20px;
+  }
+
+  .carousel-fallback {
+    width: 250px;
+    height: 200px;
+    font-size: 16px;
+    padding: 15px;
+  }
+
+  .carousel-indicator {
+    width: 10px;
+    height: 10px;
+    gap: 10px;
   }
 }
