@@ -4,7 +4,7 @@ export default defineAppConfig({
   ],
   window: {
     backgroundTextStyle: 'light',
-    navigationBarTitleText: '闽派新语',
+    navigationBarTitleText: '闽派数语',
     navigationBarBackgroundColor: '#fff',
     navigationBarTextStyle: 'black'
   },

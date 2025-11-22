@@ -1,13 +1,21 @@
 /**
- * AMD polyfill for WeChat Mini Program
+ * Enhanced AMD polyfill for WeChat Mini Program
  * 解决微信小程序环境中缺少define函数的问题
  */
 
-// 检查是否已经有define函数
-if (typeof define !== 'function') {
+// 立即执行函数，确保在模块加载前就注入define
+(function() {
+  'use strict';
+
+  // 检查是否已经有define函数
+  if (typeof define === 'function') {
+    console.log('define function already exists, skipping polyfill');
+    return;
+  }
+
   // 创建全局define函数
   var define = function(name, deps, factory) {
-    // 支持两种调用方式：
+    // 支持多种调用方式：
     // 1. define(name, deps, factory)
     // 2. define(deps, factory)
     // 3. define(factory)
@@ -59,10 +67,24 @@ if (typeof define !== 'function') {
     version: '2.1.0'
   };
 
-  // 将define函数设置为全局函数
-  global.define = define;
+  // 多重注入确保define函数在所有环境中可用
+  if (typeof global !== 'undefined') {
+    global.define = define;
+  }
+  if (typeof window !== 'undefined') {
+    window.define = define;
+  }
+  if (typeof globalThis !== 'undefined') {
+    globalThis.define = define;
+  }
+  if (typeof self !== 'undefined') {
+    self.define = define;
+  }
 
-  console.log('AMD polyfill loaded successfully');
-} else {
-  console.log('define function already exists, skipping polyfill');
-}
+  // 在微信小程序环境中，也要确保define在wx对象上可用
+  if (typeof wx !== 'undefined') {
+    wx.define = define;
+  }
+
+  console.log('Enhanced AMD polyfill loaded successfully');
+})();

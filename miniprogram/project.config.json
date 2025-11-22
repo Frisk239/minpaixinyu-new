@@ -1,6 +1,6 @@
 {
 	"miniprogramRoot": "dist/",
-	"projectname": "闽派新语",
+	"projectname": "闽派数语",
 	"description": "项目配置文件，详见文档：https://developers.weixin.qq.com/miniprogram/dev/devtools/projectconfig.html",
 	"appid": "wx25d7057738ff4de5",
 	"setting": {
