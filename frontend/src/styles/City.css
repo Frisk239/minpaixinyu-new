@@ -242,6 +242,8 @@
   backdrop-filter: blur(10px);
   border: 2px solid rgba(218, 165, 32, 0.2);
   min-height: 600px;
+  max-height: none;
+  overflow: visible;
 }
 
 /* 内容加载状态 */
@@ -288,14 +290,49 @@
 .city-image-container {
   display: flex;
   justify-content: center;
-  align-items: flex-start;
+  align-items: center;
   height: 100%;
-  min-height: 500px;
-  max-height: calc(100vh - 150px);
+  min-height: 600px;
+  max-height: calc(100vh - 120px);
   padding: 10px;
-  overflow: hidden;
+  overflow: visible;
 }
 
+/* 轮播组件在城市页面中的特定样式 */
+.city-carousel {
+  width: 100%;
+  height: auto;
+  border-radius: 15px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.city-carousel .carousel-container {
+  height: auto;
+  width: 100%;
+  flex: 1;
+}
+
+.city-carousel .carousel-image-wrapper {
+  height: auto;
+  min-height: 500px;
+  max-height: calc(100vh - 200px);
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.city-carousel .carousel-image {
+  width: 100%;
+  height: auto;
+  max-height: calc(100vh - 200px);
+  object-fit: contain;
+  object-position: center;
+}
+
+/* 保留原有的单图片样式作为后备 */
 .city-image {
   max-width: 100%;
   max-height: 100%;

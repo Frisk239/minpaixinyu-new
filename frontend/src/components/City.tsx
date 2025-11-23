@@ -2,8 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import WordReader from './WordReader';
+import ImageCarousel from './ImageCarousel';
 import { useResponsiveImage } from '../utils/useResponsiveImage';
 import '../styles/City.css';
+import '../styles/ImageCarousel.css';
 
 interface CityExploration {
   id: number;
@@ -350,14 +352,10 @@ const City: React.FC = () => {
           {activeTab === 'map' && !contentLoading && (
             <div className="content-section">
               <div className="city-image-container">
-                <img
-                  src={`/static/${cityKey}/${cityKey}.png`}
-                  alt={`${decodedCityName}文化地点分布`}
-                  className="city-image"
-                  onError={(e) => {
-                    const target = e.target as HTMLImageElement;
-                    target.src = '/static/image/index.png';
-                  }}
+                <ImageCarousel
+                  cityKey={cityKey}
+                  cityName={decodedCityName}
+                  className="city-carousel"
                 />
               </div>
             </div>
