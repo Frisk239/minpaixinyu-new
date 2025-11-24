@@ -21,31 +21,31 @@ const QuizSelection: React.FC = () => {
     {
       name: '福州侯官文化',
       description: '敢为天下先，开眼看世界。',
-      image: '/static/image/fuzhou.PNG',
+      image: '/static/image/fuzhou.png',
       questionCount: 5
     },
     {
       name: '泉州海丝文化',
       description: '爱拼才会赢，潮声传五洲。',
-      image: '/static/image/quanzhou.PNG',
+      image: '/static/image/quanzhou.png',
       questionCount: 5
     },
     {
       name: '南平朱子文化',
       description: '格物致知理，继往开来魂。',
-      image: '/static/image/nanping.PNG',
+      image: '/static/image/nanping.png',
       questionCount: 5
     },
     {
       name: '龙岩红色文化',
       description: '星火可燎原，浩气永长存。',
-      image: '/static/image/longyan.PNG',
+      image: '/static/image/longyan.png',
       questionCount: 5
     },
     {
       name: '莆田妈祖文化',
       description: '大爱通四海，慈光佑五洲。',
-      image: '/static/image/putian.PNG',
+      image: '/static/image/putian.png',
       questionCount: 5
     }
   ];
