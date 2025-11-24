@@ -26,6 +26,7 @@ const DiscussionForum: React.FC = () => {
   const [editContent, setEditContent] = useState('');
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
   const [error, setError] = useState('');
 
   // 获取当前用户信息
@@ -49,6 +50,7 @@ const DiscussionForum: React.FC = () => {
       const response = await axios.get(`/api/discussions?page=${pageNum}&per_page=20`);
       setDiscussions(response.data.discussions);
       setTotalPages(response.data.pagination.pages);
+      setTotalCount(response.data.pagination.total);
       setPage(pageNum);
     } catch (error: any) {
       console.error('获取讨论列表失败:', error);
@@ -86,6 +88,7 @@ const DiscussionForum: React.FC = () => {
       });
 
       setDiscussions([response.data.discussion, ...discussions]);
+      setTotalCount(totalCount + 1);
       setNewContent('');
       setError('');
     } catch (error: any) {
@@ -107,6 +110,7 @@ const DiscussionForum: React.FC = () => {
     try {
       await axios.delete(`/api/discussions/${id}`);
       setDiscussions(discussions.filter(d => d.id !== id));
+      setTotalCount(totalCount - 1);
     } catch (error: any) {
       console.error('删除观点失败:', error);
       setError(error.response?.data?.error || '删除观点失败，请稍后重试');
@@ -220,7 +224,7 @@ const DiscussionForum: React.FC = () => {
 
         {/* 讨论列表 */}
         <div className="discussions-list">
-          <h3>观点交流 ({discussions.length})</h3>
+          <h3>观点交流 ({totalCount})</h3>
 
           {loading ? (
             <div className="loading">
