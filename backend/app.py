@@ -89,6 +89,28 @@ class UserCityExploration(db.Model):
             'created_at': self.created_at.isoformat()
         }
 
+# 观点交流表
+class Discussion(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    username = db.Column(db.String(80), nullable=False)  # 冗余存储用户名，删除用户时保持显示
+    content = db.Column(db.Text, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    # 建立与用户的关联
+    user = db.relationship('User', backref=db.backref('discussions', lazy=True, cascade='all, delete-orphan'))
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'user_id': self.user_id,
+            'username': self.username,
+            'content': self.content,
+            'created_at': self.created_at.isoformat(),
+            'updated_at': self.updated_at.isoformat()
+        }
+
 # 创建数据库表
 with app.app_context():
     db.create_all()
@@ -209,8 +231,11 @@ def delete_account():
     # 清除session
     session.pop('user_id', None)
 
-    # 删除用户的所有相关数据（但保留匿名统计）
+    # 删除用户的所有相关数据
     try:
+        # 删除观点交流记录
+        Discussion.query.filter_by(user_id=user_id).delete()
+
         # 删除城市探索记录
         UserCityExploration.query.filter_by(user_id=user_id).delete()
 
@@ -219,7 +244,7 @@ def delete_account():
         db.session.commit()
 
         return jsonify({
-            'message': '账号已成功注销，感谢您的使用',
+            'message': '账号已成功注销，所有相关数据已清除',
             'anonymous_stats_preserved': True
         }), 200
 
@@ -774,6 +799,151 @@ def game_ai_decision():
         import traceback
         traceback.print_exc()
         return jsonify({'error': 'AI服务暂时不可用'}), 500
+
+# 观点交流相关API
+@app.route('/api/discussions', methods=['GET'])
+def get_discussions():
+    """获取所有观点交流留言"""
+    try:
+        page = request.args.get('page', 1, type=int)
+        per_page = request.args.get('per_page', 20, type=int)
+
+        # 分页获取留言，按创建时间倒序
+        discussions = Discussion.query.order_by(
+            Discussion.created_at.desc()
+        ).paginate(
+            page=page,
+            per_page=per_page,
+            error_out=False
+        )
+
+        return jsonify({
+            'discussions': [discussion.to_dict() for discussion in discussions.items],
+            'pagination': {
+                'page': discussions.page,
+                'pages': discussions.pages,
+                'per_page': discussions.per_page,
+                'total': discussions.total,
+                'has_next': discussions.has_next,
+                'has_prev': discussions.has_prev
+            }
+        }), 200
+
+    except Exception as e:
+        print(f"获取观点交流失败: {str(e)}")
+        return jsonify({'error': '获取观点交流失败'}), 500
+
+@app.route('/api/discussions', methods=['POST'])
+def create_discussion():
+    """发表观点交流"""
+    try:
+        user_id = session.get('user_id')
+        if not user_id:
+            return jsonify({'error': '请先登录'}), 401
+
+        data = request.get_json()
+        if not data or not data.get('content'):
+            return jsonify({'error': '留言内容不能为空'}), 400
+
+        content = data['content'].strip()
+        if not content:
+            return jsonify({'error': '留言内容不能为空'}), 400
+
+        if len(content) > 1000:
+            return jsonify({'error': '留言内容不能超过1000字符'}), 400
+
+        # 获取用户信息
+        user = User.query.get(user_id)
+        if not user:
+            return jsonify({'error': '用户不存在'}), 401
+
+        # 创建新留言
+        discussion = Discussion(
+            user_id=user_id,
+            username=user.username,
+            content=content
+        )
+
+        db.session.add(discussion)
+        db.session.commit()
+
+        return jsonify({
+            'message': '留言发表成功',
+            'discussion': discussion.to_dict()
+        }), 201
+
+    except Exception as e:
+        print(f"发表观点交流失败: {str(e)}")
+        db.session.rollback()
+        return jsonify({'error': '发表留言失败，请稍后重试'}), 500
+
+@app.route('/api/discussions/<int:discussion_id>', methods=['DELETE'])
+def delete_discussion(discussion_id):
+    """删除自己的留言"""
+    try:
+        user_id = session.get('user_id')
+        if not user_id:
+            return jsonify({'error': '请先登录'}), 401
+
+        discussion = Discussion.query.get(discussion_id)
+        if not discussion:
+            return jsonify({'error': '留言不存在'}), 404
+
+        # 检查是否是留言的作者
+        if discussion.user_id != user_id:
+            return jsonify({'error': '只能删除自己的留言'}), 403
+
+        db.session.delete(discussion)
+        db.session.commit()
+
+        return jsonify({'message': '留言删除成功'}), 200
+
+    except Exception as e:
+        print(f"删除观点交流失败: {str(e)}")
+        db.session.rollback()
+        return jsonify({'error': '删除留言失败，请稍后重试'}), 500
+
+@app.route('/api/discussions/<int:discussion_id>', methods=['PUT'])
+def update_discussion(discussion_id):
+    """修改自己的留言"""
+    try:
+        user_id = session.get('user_id')
+        if not user_id:
+            return jsonify({'error': '请先登录'}), 401
+
+        discussion = Discussion.query.get(discussion_id)
+        if not discussion:
+            return jsonify({'error': '留言不存在'}), 404
+
+        # 检查是否是留言的作者
+        if discussion.user_id != user_id:
+            return jsonify({'error': '只能修改自己的留言'}), 403
+
+        data = request.get_json()
+        if not data or not data.get('content'):
+            return jsonify({'error': '留言内容不能为空'}), 400
+
+        content = data['content'].strip()
+        if not content:
+            return jsonify({'error': '留言内容不能为空'}), 400
+
+        if len(content) > 1000:
+            return jsonify({'error': '留言内容不能超过1000字符'}), 400
+
+        # 更新留言
+        discussion.content = content
+        discussion.updated_at = datetime.utcnow()
+        db.session.commit()
+
+        return jsonify({
+            'message': '留言修改成功',
+            'discussion': discussion.to_dict()
+        }), 200
+
+    except Exception as e:
+        print(f"修改观点交流失败: {str(e)}")
+        db.session.rollback()
+        return jsonify({'error': '修改留言失败，请稍后重试'}), 500
 
 # 静态文件路由
 @app.route('/static/<path:filename>')

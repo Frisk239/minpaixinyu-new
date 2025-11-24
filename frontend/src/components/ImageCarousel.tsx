@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from 'react';
+import ReactDOM from 'react-dom';
+import ImagePlayer from './ImagePlayer';
 import '../styles/ImageCarousel.css';
+import '../styles/ImagePlayer.css';
 
 interface ImageCarouselProps {
   cityKey: string;
@@ -16,6 +19,8 @@ const ImageCarousel: React.FC<ImageCarouselProps> = ({
   const [images, setImages] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+  const [showPlayer, setShowPlayer] = useState(false);
+  const [currentImageUrl, setCurrentImageUrl] = useState('');
 
   // 图片路径
   const imagePaths = [
@@ -69,6 +74,15 @@ const ImageCarousel: React.FC<ImageCarouselProps> = ({
 
   const goToSlide = (index: number) => {
     setCurrentImageIndex(index);
+  };
+
+  const handleImageClick = (imageUrl: string) => {
+    setCurrentImageUrl(imageUrl);
+    setShowPlayer(true);
+  };
+
+  const closePlayer = () => {
+    setShowPlayer(false);
   };
 
   // 键盘导航支持
@@ -128,7 +142,18 @@ const ImageCarousel: React.FC<ImageCarouselProps> = ({
           src={images[0]}
           alt={`${cityName}文化地点分布`}
           className="carousel-image"
+          onClick={() => handleImageClick(images[0])}
+          style={{ cursor: 'pointer' }}
         />
+
+        {/* 图片播放器 */}
+        {showPlayer && ReactDOM.createPortal(
+          <ImagePlayer
+            imageUrl={currentImageUrl}
+            onClose={closePlayer}
+          />,
+          document.body
+        )}
       </div>
     );
   }
@@ -142,6 +167,8 @@ const ImageCarousel: React.FC<ImageCarouselProps> = ({
             src={images[currentImageIndex]}
             alt={`${cityName}文化地点分布 - 图片 ${currentImageIndex + 1}`}
             className="carousel-image"
+            onClick={() => handleImageClick(images[currentImageIndex])}
+            style={{ cursor: 'pointer' }}
           />
 
           {/* 左右切换按钮 */}
@@ -182,7 +209,17 @@ const ImageCarousel: React.FC<ImageCarouselProps> = ({
       {/* 图片来源说明 */}
       <div className="carousel-hint">
         <p>图源：福建师范大学地理科学学院、碳中和未来技术学院彭红茹</p>
+        <p style={{ fontSize: '12px', marginTop: '5px', opacity: '0.8' }}>点击图片可放大查看</p>
       </div>
+
+      {/* 图片播放器 */}
+      {showPlayer && ReactDOM.createPortal(
+        <ImagePlayer
+          imageUrl={currentImageUrl}
+          onClose={closePlayer}
+        />,
+        document.body
+      )}
     </div>
   );
 };

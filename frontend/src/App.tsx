@@ -16,6 +16,7 @@ import Quiz from './components/Quiz';
 import QuizResult from './components/QuizResult';
 import Profile from './components/Profile';
 import GameEntry from './components/GameEntry';
+import DiscussionForum from './components/DiscussionForum';
 import Navbar from './components/Navbar';
 import './App.css';
 
@@ -260,6 +261,14 @@ function App() {
             element={
               authState.isAuthenticated ?
                 <Profile user={authState.user!} onLogout={logout} /> :
+                <Navigate to="/" replace />
+            }
+          />
+          <Route
+            path="/discussion-forum"
+            element={
+              authState.isAuthenticated ?
+                <DiscussionForum /> :
                 <Navigate to="/" replace />
             }
           />

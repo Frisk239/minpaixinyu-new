@@ -81,6 +81,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
             <span className="navbar-item">资料汇编</span>
             <span className="navbar-item">线上桌游</span>
             <span className="navbar-item">互动答题</span>
+            <span className="navbar-item">观点交流</span>
             <span className="navbar-item">个人中心</span>
           </div>
 

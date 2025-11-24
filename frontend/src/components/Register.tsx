@@ -97,8 +97,10 @@ const Register: React.FC<RegisterProps> = ({ onLogin }) => {
             <span className="navbar-item">文化云游</span>
             <span className="navbar-item">AI对话</span>
             <span className="navbar-item">有声读物</span>
+            <span className="navbar-item">资料汇编</span>
             <span className="navbar-item">线上桌游</span>
             <span className="navbar-item">互动答题</span>
+            <span className="navbar-item">观点交流</span>
             <span className="navbar-item">个人中心</span>
           </div>
 
